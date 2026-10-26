@@ -1,6 +1,6 @@
 # work-to-skills
 
-**Version 0.3.1** (2026-10-26) · [Changelog](CHANGELOG.md) · MIT · **English** · [한국어](README_KO.md)
+**Version 0.3.2** (2026-10-26) · [Changelog](CHANGELOG.md) · [Privacy](PRIVACY.md) · MIT · **English** · [한국어](README_KO.md)
 
 A Claude Code plugin that reads your own Claude Code history and tells you **which areas of your work deserve a skill**.
 
@@ -55,7 +55,7 @@ Results go to `~/Documents/work-to-skills/`. To preview one first, download and 
 
 ## Privacy and what it accesses
 
-Everything is processed on your machine. Transcripts can contain source code and internal discussions verbatim, so the skill never uploads or publishes the report unless you explicitly ask.
+Everything is processed on your machine. Full policy: [Privacy](PRIVACY.md). Transcripts can contain source code and internal discussions verbatim, so the skill never uploads or publishes the report unless you explicitly ask.
 
 | | |
 |---|---|

@@ -1,7 +1,7 @@
 {
   "name": "work-to-skills",
   "description": "Finds the areas of your work where you keep giving Claude the same corrections and running the same multi-step flow, and proposes the skills to build for them, with the rules quoted from what you said and a prompt that builds them. Reads your local Claude Code history, /insights analysis and the skills, CLAUDE.md and memory you already have, and points out rules missing from existing skills. Also lists small command/hook automations and tracks whether repeats go down. Local HTML report in Korean or English. 어느 업무 영역에 스킬을 만들지 알려 주는 한국어·영어 리포트.",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": {
     "name": "Soul Kim",
     "url": "https://github.com/Soulddgy"
@@ -21,5 +21,6 @@
     "skill-recommendation"
   ],
   "homepage": "https://github.com/Soulddgy/work-to-skills",
-  "repository": "https://github.com/Soulddgy/work-to-skills"
+  "repository": "https://github.com/Soulddgy/work-to-skills",
+  "privacyPolicyUrl": "https://github.com/Soulddgy/work-to-skills/blob/main/PRIVACY.md"
 }

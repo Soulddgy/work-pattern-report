@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2 — 2026-10-26
+
+- Added a privacy policy (`PRIVACY.md`), linked from plugin.json (`privacyPolicyUrl`) and both READMEs.
+
 ## 0.3.1 — 2026-10-26
 
 - Moved the README screenshots to the `assets` branch so they are no longer part of the plugin files. The directory scanner kept flagging the compressed image bytes as a shell pattern.
