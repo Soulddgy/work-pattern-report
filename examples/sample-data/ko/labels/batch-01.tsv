@@ -1,0 +1,76 @@
+S019	release
+S018	writing
+S017	feature
+S016	fix
+S015	feature
+S014	release
+S013	writing
+S012	feature
+S011	fix
+S010	feature
+S009	release
+S008	writing
+S007	feature
+S006	fix
+S005	feature
+S004	release
+S003	writing
+S002	feature
+S001	fix
+p0002		run tests
+p0003		commit & push
+p0004		deploy to staging
+p0005		update changelog
+p0007		match design spec
+p0008		run tests
+p0009		commit & push
+p0010		open PR & request review
+p0013		export cover image
+p0015		deploy to staging
+p0016		check server logs
+p0017		commit & push
+p0019		run tests
+p0020		open PR & request review
+p0021		update changelog
+p0023		run tests
+p0024		commit & push
+p0025		deploy to staging
+p0026		update changelog
+p0028		match design spec
+p0029		run tests
+p0030		commit & push
+p0031		open PR & request review
+p0034		export cover image
+p0036		deploy to staging
+p0037		check server logs
+p0038		commit & push
+p0040		run tests
+p0041		open PR & request review
+p0042		update changelog
+p0044		run tests
+p0045		commit & push
+p0046		deploy to staging
+p0047		update changelog
+p0049		match design spec
+p0050		run tests
+p0051		commit & push
+p0052		open PR & request review
+p0055		export cover image
+p0057		deploy to staging
+p0058		check server logs
+p0059		commit & push
+p0061		run tests
+p0062		open PR & request review
+p0063		update changelog
+p0065		run tests
+p0066		commit & push
+p0067		deploy to staging
+p0068		update changelog
+p0070		match design spec
+p0071		run tests
+p0072		commit & push
+p0073		open PR & request review
+p0076		export cover image
+p0078		deploy to staging
+p0079		check server logs
+p0080		commit & push

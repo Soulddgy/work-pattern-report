@@ -1,0 +1,70 @@
+[
+ {
+  "since": "2026-08-31",
+  "until": "2026-09-27",
+  "days": 28,
+  "scope": "",
+  "prompts": 61,
+  "generated": "2026-09-27T18:00",
+  "repeats": {
+   "commit & push": {
+    "n": 9,
+    "days": 7
+   },
+   "run tests": {
+    "n": 6,
+    "days": 5
+   },
+   "export cover image": {
+    "n": 5,
+    "days": 4
+   },
+   "match design spec": {
+    "n": 2,
+    "days": 2
+   }
+  }
+ },
+ {
+  "since": "2026-09-29",
+  "until": "2026-10-26",
+  "days": 28,
+  "scope": "",
+  "prompts": 80,
+  "generated": "2026-10-26T14:16",
+  "repeats": {
+   "commit & push": {
+    "n": 12,
+    "days": 12
+   },
+   "run tests": {
+    "n": 11,
+    "days": 11
+   },
+   "deploy to staging": {
+    "n": 8,
+    "days": 8
+   },
+   "update changelog": {
+    "n": 7,
+    "days": 7
+   },
+   "open PR & request review": {
+    "n": 7,
+    "days": 7
+   },
+   "match design spec": {
+    "n": 4,
+    "days": 4
+   },
+   "export cover image": {
+    "n": 4,
+    "days": 4
+   },
+   "check server logs": {
+    "n": 4,
+    "days": 4
+   }
+  }
+ }
+]

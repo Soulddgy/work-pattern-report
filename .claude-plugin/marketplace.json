@@ -1,0 +1,16 @@
+{
+  "name": "work-pattern-report",
+  "description": "Work Pattern Report: an /insights companion skill for Claude Code (Korean/English).",
+  "owner": {
+    "name": "Soul Kim",
+    "url": "https://github.com/Soulddgy"
+  },
+  "plugins": [
+    {
+      "name": "work-pattern-report",
+      "source": "./",
+      "description": "A companion to Claude Code's /insights: counts your repeated requests and the commands Claude ran, and turns them into automation candidates in a local HTML report (Korean/English).",
+      "version": "0.1.0"
+    }
+  ]
+}

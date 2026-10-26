@@ -1,0 +1,1 @@
+{"tools": [["Bash", 820], ["Read", 260], ["Edit", 140]], "commands": [["grep", 300], ["sed", 120], ["cat", 90], ["npm test", 64], ["npm run", 40], ["git push", 31], ["git commit", 29], ["curl", 22], ["gh pr", 18], ["node", 15], ["docker compose", 12]], "skills": [["git-workflow", 5]], "slash_commands": [], "mcp_servers": [["browser", 30]]}

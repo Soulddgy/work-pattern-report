@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.DS_Store
+# never commit reports or work folders built from real transcripts
+*-workspace/
+data/
+report_*.html
+history.json
+!examples/sample-data/*/history.json
