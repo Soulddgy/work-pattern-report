@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 — 2026-10-26
+
+- No longer reads `~/.claude/settings.json`. It was only used to check for overlapping hooks, and it can hold API keys, so the directory scanner flagged it. The overlap check now covers skills, CLAUDE.md and scheduled routines.
+- Re-encoded the README screenshots. The old compressed bytes happened to match a scanner pattern; the images look the same.
+
 ## 0.2.0 — 2026-10-26
 
 - **Work-area skill candidates are now the main output.** The skill groups sessions into work areas, tags the rules you state while correcting the work (corrections, preferences, constraints, reasons for rejecting a result) and proposes a set of skills per area: the flow, the rules in your own words with dates, a proposed skill split by stage, and a build prompt for skill-creator.

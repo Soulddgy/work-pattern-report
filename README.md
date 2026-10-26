@@ -1,6 +1,6 @@
 # work-pattern-report
 
-**Version 0.2.0** (2026-10-26) · [Changelog](CHANGELOG.md) · MIT · **English** · [한국어](README_KO.md)
+**Version 0.2.1** (2026-10-26) · [Changelog](CHANGELOG.md) · MIT · **English** · [한국어](README_KO.md)
 
 A Claude Code plugin that reads your own Claude Code history and tells you **which areas of your work deserve a skill**.
 
@@ -59,7 +59,7 @@ Everything is processed on your machine. Transcripts can contain source code and
 
 | | |
 |---|---|
-| **Reads** | `~/.claude/projects/*/*.jsonl` (your Claude Code transcripts) and per-project memory (`~/.claude/projects/*/memory/`), `~/.claude/usage-data/` (what `/insights` left), and to see what you already built: `~/.claude/skills/`, `.claude/skills/` and `CLAUDE.md` in the folders you work in, and `~/.claude/settings.json` |
+| **Reads** | `~/.claude/projects/*/*.jsonl` (your Claude Code transcripts) and per-project memory (`~/.claude/projects/*/memory/`), `~/.claude/usage-data/` (what `/insights` left), and to see what you already built: `~/.claude/skills/`, plus `.claude/skills/` and `CLAUDE.md` in the folders you work in. It does not read settings or credential files |
 | **Writes** | only `~/Documents/work-pattern-report/` (the report, its working data and the run history), or a folder you name |
 | **Runs** | the two bundled Python scripts (`extract.py`, `render.py`, standard library only), and your system's `open` / `xdg-open` / `start` to show the report |
 | **Network** | none. The scripts make no network requests, and the report loads nothing from the internet |

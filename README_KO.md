@@ -1,6 +1,6 @@
 # work-pattern-report
 
-**버전 0.2.0** (2026-10-26) · [변경 내역](CHANGELOG.md) · MIT · [English](README.md) · **한국어**
+**버전 0.2.1** (2026-10-26) · [변경 내역](CHANGELOG.md) · MIT · [English](README.md) · **한국어**
 
 내 Claude Code 사용 기록을 보고 **어느 업무 영역에 스킬을 만들면 좋을지** 알려 주는 Claude Code 플러그인입니다.
 
@@ -59,7 +59,7 @@ Claude를 오래 쓰다 보면 같은 일을 할 때마다 같은 말을 반복�
 
 | | |
 |---|---|
-| **읽는 것** | `~/.claude/projects/*/*.jsonl`(Claude Code 대화 기록)과 프로젝트별 메모리(`~/.claude/projects/*/memory/`), `~/.claude/usage-data/`(`/insights` 가 남긴 분석), 이미 만든 것을 확인하려고 `~/.claude/skills/`, 작업 폴더의 `.claude/skills/` 와 `CLAUDE.md`, `~/.claude/settings.json` |
+| **읽는 것** | `~/.claude/projects/*/*.jsonl`(Claude Code 대화 기록)과 프로젝트별 메모리(`~/.claude/projects/*/memory/`), `~/.claude/usage-data/`(`/insights` 가 남긴 분석), 이미 만든 것을 확인하려고 `~/.claude/skills/`, 작업 폴더의 `.claude/skills/` 와 `CLAUDE.md`. 설정 파일이나 인증 정보 파일은 읽지 않습니다 |
 | **쓰는 것** | `~/Documents/work-pattern-report/`(리포트, 중간 데이터, 실행 기록) 또는 지정한 폴더만 |
 | **실행하는 것** | 들어 있는 Python 스크립트 두 개(`extract.py`, `render.py`, 표준 라이브러리만)와 리포트를 여는 `open` / `xdg-open` / `start` |
 | **네트워크** | 없음. 스크립트는 네트워크 요청을 하지 않고, 리포트도 인터넷에서 아무것도 불러오지 않습니다 |

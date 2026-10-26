@@ -188,7 +188,7 @@ How to fill it:
 - Add `friction_types` when the candidate addresses a friction; the report counts that friction across the sessions where the linked repeats occurred.
 - Weigh **days** above raw count. Ten times in one day can be one task being reworked; five different days is a habit.
 - Work whose core is judgment or taste (planning, copy, design decisions) is not a candidate. Look at the mechanical steps around it (file housekeeping, spec checks, upload prep). If the fix for such friction is a habit like "write a brief first", /insights already suggests it, so don't repeat it here.
-- Check for overlap with what exists: `~/.claude/skills/`, hooks in `~/.claude/settings.json`, the project's `.claude/`, scheduled routines. If it overlaps, write "extend X" instead of "build new". If a previous candidate was already built, say in the observations whether its repeat went down in the comparison table.
+- Check for overlap with what exists: `~/.claude/skills/`, the project's `.claude/skills/` and `CLAUDE.md`, scheduled routines. If it overlaps, write "extend X" instead of "build new". If a previous candidate was already built, say in the observations whether its repeat went down in the comparison table.
 - `effort` is how much it takes to build: `S` one file, under an hour (a hook, a short script, a skill with fixed steps); `M` half a day to a day, a few places touched (a skill tying several tools together, extending an existing skill); `L` days, or needs design or team agreement (CI changes, cross-repo work). The report spells these out in words.
 - `type` is the form it would take: skill, hook, script, scheduled routine, CI, or a settings change. If a step must keep human approval (commit, merge, publishing), say "keeps the approval step" in `approach`.
 - At most 4, highest payoff first.
@@ -197,7 +197,7 @@ How to fill it:
 - `trigger` — what starts it: a command the user types (`/name`), a hook event (`PreToolUse` on `git commit`, `Stop`, …), a schedule, or CI on push/PR.
 - `steps` — 2–6 concrete steps in order, using the real commands, paths and tools seen in `tools.json` and the transcripts (`gradlew assembleDebug`, `adb install`, the actual notes folder) rather than generic verbs. Mark any step that must stay a human decision with `"manual": true` (commit, merge, choosing a device, publishing); the report tags it "needs approval".
 - `output` — what the user gets at the end, so they can tell it worked.
-- `where` — the file it would live in (`~/.claude/skills/<name>/SKILL.md`, `~/.claude/settings.json` hooks, a project `.claude/`, a script path).
+- `where` — the file it would live in (`~/.claude/skills/<name>/SKILL.md`, a hooks entry in Claude Code settings, a project `.claude/`, a script path).
 - `keep_manual` — what deliberately stays with the person.
 - `prompt` — a ready-to-paste request that tells Claude Code to build exactly this: name, location, steps in order, the approval points, and what it must never do. One paragraph, in both languages.
 
