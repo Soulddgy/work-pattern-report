@@ -1,21 +1,35 @@
 # work-pattern-report
 
-**Version 0.1.1** (2026-10-26) · [Changelog](CHANGELOG.md) · MIT · **English** · [한국어](README_KO.md)
+**Version 0.2.0** (2026-10-26) · [Changelog](CHANGELOG.md) · MIT · **English** · [한국어](README_KO.md)
 
-A Claude Code plugin that counts your own Claude Code history and shows, in one HTML report, **what you keep asking for** and **which of it is worth automating**.
+A Claude Code plugin that reads your own Claude Code history and tells you **which areas of your work deserve a skill**.
 
-It is a companion to the built-in `/insights` command, not a replacement. It counts what `/insights` doesn't.
+Use Claude long enough and you keep saying the same things for the same kind of work. Make short videos for a few weeks and you find yourself repeating "don't composite real photos", "feed posts are 4:5", "a zoom with no action is a redo" on different days, until you finally package it into concept, generation, edit and review skills. This plugin **finds that point in your records for you.**
+
+![Sample report (synthetic data)](docs/screenshot-en.png)
+
+## What's in the report
+
+1. **Work-area skill candidates** (the main output)
+   - Areas where you ran the same flow on many days and kept restating the same rules while correcting the work
+   - For each one: the flow, the rules you built up (in your own words, with dates), the skills, CLAUDE.md and memory you already have, **rules that came back after those skills existed**, a proposed set of skills, and a **build prompt** you can paste to have Claude create them
+   - Where skills already exist, it proposes what to add instead of building new ones
+2. **Small automations**: mechanical steps you ask for every time (build and copy, commit and push) as a command, hook or script
+3. **Since last run**: whether each repeated request went up or down
+4. Task types, repeated requests, `/insights` friction, week by week, commands Claude actually ran, prompts per day and project, longest sessions
+
+The report is one file that works offline. Switch between Korean and English in the top bar; sections and blocks fold and unfold (build prompts start unfolded).
+
+## How it differs from `/insights`
 
 | | `/insights` | work-pattern-report |
 |---|---|---|
 | Session goals, outcomes, friction | ✅ | reused from `/insights` |
-| How many times, **on how many days**, you asked for the same thing | — | ✅ |
-| Which commands Claude actually ran (`git commit`, `npm test`, …) | tool names only | ✅ command level |
-| Automation candidates with a ready-to-paste build prompt | — | ✅ |
-| Did the repeats go down after you automated? | — | ✅ compared with the last report |
+| Which areas need which skills | — | ✅ with rules, flow and a build prompt |
+| Rules missing from skills you already built | — | ✅ rules restated after each skill's creation date |
+| How many times, on how many days, you asked for the same thing | — | ✅ |
+| Which commands Claude actually ran | tool names only | ✅ command level |
 | Report language | English | Korean / English toggle |
-
-![Sample report (synthetic data)](docs/screenshot-en.png)
 
 ## Install
 
@@ -32,32 +46,31 @@ The "Where things got stuck" section uses the `/insights` analysis. If it is sta
 
 Ask in your own words:
 
-- "What do I spend my Claude time on? Find things I could automate."
-- "Weekly retro for last week."
-- "Only my-app, October. Focus on things I keep asking for."
+- "Which parts of my work should I make skills for?"
+- "What do I keep telling Claude? Include what my existing skills are missing."
+- "Only my-app, October."
 - "Compare the last two weeks with the two weeks before. Did the repeats go down?"
 
-Results go to `~/Documents/work-pattern-report/`. The report opens in your browser and works offline.
+Results go to `~/Documents/work-pattern-report/`. To preview one first, download and open [`examples/sample-report.en.html`](examples/sample-report.en.html) (made-up data).
 
-To preview one first, download and open [`examples/sample-report.en.html`](examples/sample-report.en.html). It is built from made-up data.
-
-## What's in the report
-
-1. **Automation candidates** — what you do now, what it looks like automated, the numbers behind it, what you actually said, a design (when it runs, the steps, where it lives, what stays with you), a success check, and a build prompt
-2. **Since last run** — whether each repeated request went up or down
-3. **Task types** — where your prompts and time went
-4. **Repeated requests** — counts, days and your own words
-5. **Where things got stuck** — the `/insights` analysis, summarized
-6. **Week by week, commands, prompts per day and project, longest sessions, observations**
-
-## Privacy
+## Privacy and what it accesses
 
 Everything is processed on your machine. Transcripts can contain source code and internal discussions verbatim, so the skill never uploads or publishes the report unless you explicitly ask.
 
+| | |
+|---|---|
+| **Reads** | `~/.claude/projects/*/*.jsonl` (your Claude Code transcripts) and per-project memory (`~/.claude/projects/*/memory/`), `~/.claude/usage-data/` (what `/insights` left), and to see what you already built: `~/.claude/skills/`, `.claude/skills/` and `CLAUDE.md` in the folders you work in, and `~/.claude/settings.json` |
+| **Writes** | only `~/Documents/work-pattern-report/` (the report, its working data and the run history), or a folder you name |
+| **Runs** | the two bundled Python scripts (`extract.py`, `render.py`, standard library only), and your system's `open` / `xdg-open` / `start` to show the report |
+| **Network** | none. The scripts make no network requests, and the report loads nothing from the internet |
+| **Through Claude** | to label your requests, Claude reads batches of your prompts in the session, the same way it reads any file you ask it to |
+| **Doesn't** | build the skills for you (it gives you the build prompt), install hooks, MCP servers or packages, change settings, or keep anything outside the folders above |
+
 ## Good to know
 
-- **Categories are Claude's judgment.** Claude reads your prompts and sorts them into task types and repeated requests. A request that could fit two places ("deploy it") sometimes lands in the other one. Read the numbers for **size and order**, not exact values.
+- **Areas, categories and rules are Claude's judgment.** Claude reads your prompts and decides which area they belong to and what counts as a rule. Read the numbers for **size and order**, not exact values.
+- **History is kept for 30 days by default.** Claude Code deletes transcripts older than `cleanupPeriodDays` (30 by default). Raise that setting if you want longer windows later.
 - **Active time is not working hours.** Only time with recorded conversation activity counts: time away is left out, and long stretches where Claude worked alone are included.
-- **Friction only covers sessions `/insights` analyzed.** `/insights` doesn't analyze every session and may not have reached the most recent ones. The skill asks you to refresh it when it is stale, and the report shows its coverage.
-- **It uses a fair number of tokens.** Claude reads and labels your history, so 30 days takes roughly 150k tokens per run. A shorter window costs less.
+- **Friction only covers sessions `/insights` analyzed.** The skill asks you to refresh it when it is stale, and the report shows its coverage.
+- **It uses a fair number of tokens.** Claude reads and labels your history: a month of one project takes roughly 150k–200k tokens per run. A narrower window or project costs less.
 - **Claude Code updates can throw the counts off.** If the transcript format changes, some messages may be missed or miscounted. Please open an issue if numbers look wrong.

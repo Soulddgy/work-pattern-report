@@ -30,8 +30,8 @@
   "until": "2026-10-26",
   "days": 28,
   "scope": "",
-  "prompts": 80,
-  "generated": "2026-10-26T14:16",
+  "prompts": 96,
+  "generated": "2026-10-26T16:45",
   "repeats": {
    "commit & push": {
     "n": 12,

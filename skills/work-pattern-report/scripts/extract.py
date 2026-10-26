@@ -215,6 +215,67 @@ def summarize_insights(sess_out):
     }
 
 
+def _born(path):
+    st = os.stat(path)
+    t = getattr(st, "st_birthtime", None) or st.st_mtime
+    return dt.datetime.fromtimestamp(t, KST).date().isoformat()
+
+
+def _front(path):
+    """name and description from a Markdown file's front matter (one-line values only)."""
+    out = {}
+    try:
+        with open(path, errors="ignore") as fh:
+            text = fh.read(4000)
+    except OSError:
+        return out
+    if text.startswith("---"):
+        head = text[3:].split("\n---", 1)[0]
+        for line in head.splitlines():
+            if ":" in line and not line.startswith((" ", "\t")):
+                k, v = line.split(":", 1)
+                if k.strip() in ("name", "description"):
+                    out[k.strip()] = v.strip().strip('"\'')[:300]
+    return out
+
+
+def scan_assets(cwds, projdirs):
+    """What the user already built for each place they work: skills, CLAUDE.md and memory, with creation dates.
+
+    The interpretation step uses this to tell "build a new skill set" from "extend what is there", and the report
+    counts rules the user re-stated after the related skill already existed."""
+    places = []
+    home = os.path.expanduser("~")
+    for cwd in sorted(cwds):
+        if cwd == home:
+            continue  # ~/.claude/skills is listed once, as user_skills
+        entry = {"cwd": cwd, "skills": [], "claude_md": None}
+        for sk in sorted(glob.glob(os.path.join(cwd, ".claude", "skills", "*", "SKILL.md"))):
+            fm = _front(sk)
+            entry["skills"].append({"name": fm.get("name") or os.path.basename(os.path.dirname(sk)),
+                                    "description": fm.get("description", ""), "created": _born(sk),
+                                    "modified": dt.datetime.fromtimestamp(os.path.getmtime(sk), KST).date().isoformat()})
+        cm = os.path.join(cwd, "CLAUDE.md")
+        if os.path.exists(cm):
+            entry["claude_md"] = {"created": _born(cm), "bytes": os.path.getsize(cm)}
+        if entry["skills"] or entry["claude_md"]:
+            places.append(entry)
+    memory = []
+    for pd in sorted(projdirs):
+        for m in sorted(glob.glob(os.path.join(PROJECTS_DIR, pd, "memory", "*.md"))):
+            if os.path.basename(m) == "MEMORY.md":
+                continue
+            fm = _front(m)
+            memory.append({"project": short_project(pd), "file": os.path.basename(m), "name": fm.get("name", ""),
+                           "description": fm.get("description", ""), "created": _born(m)})
+    user_skills = []
+    for sk in sorted(glob.glob(os.path.expanduser("~/.claude/skills/*/SKILL.md"))):
+        fm = _front(sk)
+        user_skills.append({"name": fm.get("name") or os.path.basename(os.path.dirname(sk)),
+                            "description": fm.get("description", ""), "created": _born(sk)})
+    return {"places": places, "user_skills": user_skills, "memory": memory}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
@@ -223,6 +284,8 @@ def main():
     ap.add_argument("--until")
     ap.add_argument("--project", help="only project directories whose name contains this")
     ap.add_argument("--batch-size", type=int, default=150)
+    ap.add_argument("--no-assets", action="store_true",
+                    help="don't collect existing skills, CLAUDE.md and memory (for blind tests)")
     a = ap.parse_args()
 
     today = dt.datetime.now(KST).date()
@@ -273,6 +336,8 @@ def main():
                     continue
                 if t in ("user", "assistant"):
                     s.setdefault("events", []).append(ts)
+                    if e.get("cwd") and not s.get("cwd"):
+                        s["cwd"] = e["cwd"]
                 if t == "user":
                     body = text_of(e.get("message", {}).get("content"))
                     for m in SLASH_RE.finditer(body):
@@ -360,7 +425,7 @@ def main():
 
     sess_out = []
     for sid, s in sessions.items():
-        row = {"sid": sess_index[sid], "id": sid, "project": s["project"], "title": s["title"],
+        row = {"sid": sess_index[sid], "id": sid, "project": s["project"], "cwd": s.get("cwd"), "title": s["title"],
                "start": s["start"], "end": s["end"], "prompts": s["prompts"], "compacts": s.get("compacts", 0),
                "active_min": s.get("active_min", 0),
                "tools": dict(s["tools"].most_common(8)), "commands": dict(s["commands"].most_common(10)),
@@ -371,6 +436,15 @@ def main():
     insights = summarize_insights(sess_out)
     with open(os.path.join(a.out, "sessions.json"), "w") as fh:
         json.dump(sess_out, fh, ensure_ascii=False, indent=1)
+
+    if not a.no_assets:
+        cwds = {s["cwd"] for s in sessions.values() if s.get("cwd") and os.path.isdir(s["cwd"])}
+        projdirs = {os.path.basename(os.path.dirname(f)) for f in files
+                    if os.path.basename(f)[:-6] in sessions}
+        with open(os.path.join(a.out, "assets.json"), "w") as fh:
+            json.dump(scan_assets(cwds, projdirs), fh, ensure_ascii=False, indent=1)
+    elif os.path.exists(os.path.join(a.out, "assets.json")):
+        os.remove(os.path.join(a.out, "assets.json"))
 
     with open(os.path.join(a.out, "insights.json"), "w") as fh:
         json.dump(insights, fh, ensure_ascii=False, indent=1)

@@ -2,9 +2,9 @@
 """Render the HTML report from extract.py output plus the model's labels (labels/*.tsv) and analysis.json.
 
 labels/*.tsv, one line each (tab-separated, empty cells allowed):
-  S012<TAB>task type                 session default: applies to every prompt in that session
-  p0123<TAB>task type<TAB>repeat key  per-prompt override; the repeat key is optional
-  p0124<TAB><TAB>repeat key          keep the session default type, add a repeat key
+  S012<TAB>task type<TAB>area          session default type, and the work area the session belongs to (optional)
+  p0123<TAB>task type<TAB>repeat key    per-prompt override; the repeat key is optional
+  p0124<TAB><TAB>repeat key<TAB>rule     a fourth column tags a rule the user stated (correction, preference)
 Lines starting with '#' are comments. Task types and repeat keys are ids; their display text comes from
 analysis.json, so the ids can stay in one language while the report switches between two.
 
@@ -12,6 +12,9 @@ analysis.json — every display text may be a plain string or {"ko": "...", "en"
   {"lang": "ko" | "en",                         language shown first
    "categories": [{"name": "<id>", "label": T, "desc": T}],
    "repeats": [{"key": "<id>", "label": T, "desc": T}],
+   "areas": [{"id": "<area id>", "label": T, "desc": T, "stages": [T], "rules": [{"key": "<rule id>", "text": T}],
+              "existing": ["<skill name>"], "mode": "new" | "extend",
+              "skills": [{"name": "...", "purpose": T, "contains": [T], "triggers": T}], "prompt": T, "note": T}],
    "frictions": [{"type": "wrong_approach", "title": T, "desc": T, "examples": [T, ...]}],
    "candidates": [{"title": T, "problem": T, "approach": T, "type": T, "effort": "S|M|L",
                    "repeat_keys": ["<id>"], "commands": ["gradlew assemble*"], "friction_types": ["wrong_approach"],
@@ -63,10 +66,25 @@ T = {
         "t_sessions": "세션", "t_sessions_sub": "{a}/{d}일 활동",
         "t_repeats": "반복 요청", "t_repeats_sub": "여러 날 다시 나온 요청 종류",
         "t_tools": "Claude 도구 호출", "t_tools_sub": "Bash·Read·Edit 등",
-        "nav": {"candidates": "자동화 후보", "changes": "지난번 대비", "tasks": "작업 유형", "repeats": "반복 요청",
+        "nav": {"areas": "업무 영역 스킬", "candidates": "작은 자동화", "changes": "지난번 대비", "tasks": "작업 유형", "repeats": "반복 요청",
                 "friction": "막힌 지점", "weekly": "주별 흐름", "commands": "실행한 명령", "when": "언제·어디서",
                 "sessions": "긴 세션", "notes": "관찰"},
-        "cand_h": "자동화 후보",
+        "count": "{n}개", "expand_all": "모두 펼치기", "collapse_all": "모두 접기",
+        "sum_rules": "규칙 {n}개", "sum_after": " · 스킬 만든 뒤 다시 나온 것 {n}개", "sum_existing": "스킬 {s}개 · 메모리 {m}개",
+        "sum_skills": "스킬 {n}개", "sum_prompt": "복사해서 Claude Code에 붙여 넣기", "sum_evidence": "반복 요청 {r} · 명령 {c}",
+        "sum_quotes": "{n}개", "sum_success": "기준 {n}개",
+        "area_h": "업무 영역 스킬 후보",
+        "area_lede": "한 업무 영역에서 같은 흐름을 여러 날 반복하고, 고쳐 가며 같은 규칙을 다시 말한 곳입니다. 그 규칙과 흐름을 담아 둘 스킬 묶음을 제안합니다.",
+        "area_stats": "세션 {s}개 · {d}일 · 요청 {p}건 · 약 {t}",
+        "mode_new": "새 스킬 묶음", "mode_extend": "기존 스킬 보강",
+        "flow": "작업 흐름", "rules": "쌓인 규칙", "rules_hint": "고쳐 가며 말한 기준. 스킬에 넣으면 다시 말하지 않아도 됩니다.",
+        "rule_cols": ["규칙", "횟수", "날", "마지막", "실제로 하신 말", "스킬 만든 뒤"],
+        "existing": "이미 있는 것", "existing_skill": "<code>{n}</code> {c} 만듦",
+        "existing_mem": "메모리 {n}개 (마지막 {d})", "existing_md": "CLAUDE.md ({c} 만듦)",
+        "after_note": "스킬을 다 만든 {d} 이후에도 다시 말한 규칙이 {n}개 있습니다. 이 규칙들을 스킬에 넣으세요.",
+        "proposal": "제안하는 스킬", "prop_cols": ["스킬", "역할", "담을 것", "언제 쓰나"],
+        "no_area": "여러 날에 걸쳐 같은 흐름과 규칙이 반복된 업무 영역을 찾지 못했습니다.",
+        "cand_h": "작은 자동화 (명령·hook)",
         "cand_lede": "반복 요청, 실제로 실행된 명령, /insights 마찰 기록에서 센 숫자를 근거로 골랐습니다.",
         "cand_now": "지금", "cand_auto": "자동화하면", "cand_evidence": "근거",
         "effort": {"S": "만들기 쉬움", "M": "만들기 보통", "L": "만들기 어려움"},
@@ -121,10 +139,25 @@ T = {
         "t_sessions": "Sessions", "t_sessions_sub": "active on {a} of {d} days",
         "t_repeats": "Repeated requests", "t_repeats_sub": "kinds that came back on other days",
         "t_tools": "Claude tool calls", "t_tools_sub": "Bash, Read, Edit and others",
-        "nav": {"candidates": "Candidates", "changes": "Since last run", "tasks": "Task types", "repeats": "Repeats",
+        "nav": {"areas": "Area skills", "candidates": "Small automations", "changes": "Since last run", "tasks": "Task types", "repeats": "Repeats",
                 "friction": "Friction", "weekly": "Weekly", "commands": "Commands", "when": "When & where",
                 "sessions": "Sessions", "notes": "Notes"},
-        "cand_h": "Automation candidates",
+        "count": "{n}", "expand_all": "Expand all", "collapse_all": "Collapse all",
+        "sum_rules": "{n} rules", "sum_after": " · {n} came back after the skills existed", "sum_existing": "{s} skills · {m} memory notes",
+        "sum_skills": "{n} skills", "sum_prompt": "copy and paste into Claude Code", "sum_evidence": "{r} repeated requests · {c} commands",
+        "sum_quotes": "{n}", "sum_success": "{n} checks",
+        "area_h": "Work-area skill candidates",
+        "area_lede": "Places where you ran the same flow on many days and kept restating the same rules while correcting the work. Each gets a proposed set of skills that holds those rules and that flow.",
+        "area_stats": "{s} sessions · {d} days · {p} prompts · ~{t}",
+        "mode_new": "New skill set", "mode_extend": "Extend existing skills",
+        "flow": "Work flow", "rules": "Rules you built up", "rules_hint": "Standards you stated while correcting the work. Put them in a skill and you won't have to say them again.",
+        "rule_cols": ["Rule", "Count", "Days", "Last", "What you said", "After skill"],
+        "existing": "Already there", "existing_skill": "<code>{n}</code> created {c}",
+        "existing_mem": "{n} memory notes (last {d})", "existing_md": "CLAUDE.md (created {c})",
+        "after_note": "{n} rules came up again after the skills were finished on {d}. Add these to the skills.",
+        "proposal": "Proposed skills", "prop_cols": ["Skill", "Role", "Holds", "Use when"],
+        "no_area": "No work area showed the same flow and rules repeated across many days.",
+        "cand_h": "Small automations (commands, hooks)",
         "cand_lede": "Chosen from repeated requests, commands Claude actually ran and /insights friction, all counted from this period's records.",
         "cand_now": "Now", "cand_auto": "Automated", "cand_evidence": "Evidence",
         "effort": {"S": "Easy to build", "M": "Moderate to build", "L": "Hard to build"},
@@ -209,7 +242,7 @@ def load(work):
     insights = json.load(open(ip)) if os.path.exists(ip) else {"available": False}
     ap = os.path.join(work, "analysis.json")
     analysis = json.load(open(ap)) if os.path.exists(ap) else {}
-    sess_default, per_prompt = {}, {}
+    sess_default, sess_area, per_prompt = {}, {}, {}
     for f in sorted(glob.glob(os.path.join(work, "labels", "*.tsv"))):
         for line in open(f):
             line = line.rstrip("\n")
@@ -222,17 +255,25 @@ def load(work):
             if key.startswith("S"):
                 if cat:
                     sess_default[key] = cat
+                if rep:
+                    sess_area[key] = rep
             elif key.startswith("p"):
                 cur = per_prompt.setdefault(key, {})
                 if cat:
                     cur["task"] = cat
                 if rep:
                     cur["repeat"] = rep
+                if len(parts) > 3 and parts[3]:
+                    cur["rule"] = parts[3]
     for p in prompts:
         lab = per_prompt.get(p["id"], {})
         p["task"] = lab.get("task") or sess_default.get(p["sid"]) or "?"
         p["repeat"] = lab.get("repeat")
+        p["rule"] = lab.get("rule")
+        p["area"] = sess_area.get(p["sid"])
         p.setdefault("active_min", 0)
+    asp = os.path.join(work, "assets.json")
+    analysis["_assets"] = json.load(open(asp)) if os.path.exists(asp) else None
     return prompts, sessions, tools, stats, insights, analysis
 
 
@@ -367,9 +408,22 @@ def history_compare(path, stats, reps):
     return prev
 
 
-def section(num, sid, title, lede, inner):
-    return (f"<header class='sh'><span class='no'>{num:02d}</span><h2>{E(title)}</h2></header>"
-            + (f"<p class='lede'>{lede}</p>" if lede else "") + inner)
+OPEN_SECTIONS = {"areas", "changes"}  # everything else starts folded, with its count beside the title
+
+
+def section(num, sid, title, lede, inner, meta=""):
+    return (f"<details class='sec'{' open' if sid in OPEN_SECTIONS else ''}><summary class='sh'>"
+            f"<span class='no'>{num:02d}</span><h2>{E(title)}</h2>"
+            + (f"<span class='meta'>{E(meta)}</span>" if meta else "") + "<span class='tg' aria-hidden='true'></span></summary>"
+            + "<div class='secbody'>" + (f"<p class='lede'>{lede}</p>" if lede else "") + inner + "</div></details>")
+
+
+def blk(title, content, meta="", open_=False):
+    """One foldable block inside a card: the title and a one-line summary stay visible."""
+    if not content:
+        return ""
+    return (f"<details class='blk'{' open' if open_ else ''}><summary><h4>{title}</h4>"
+            f"<span class='sum'>{meta}</span></summary><div class='bd'>{content}</div></details>")
 
 
 def figure(title, inner, note=""):
@@ -411,6 +465,77 @@ def build_page(r, prompts, sessions, tools, stats, insights, analysis, prev, his
                  if stats["prev_prompts"] else r.t("t_noprev"))
 
     sections = []  # (id, title-for-nav, html)
+
+    # ---- work-area skill candidates (the main output)
+    assets = analysis.get("_assets") or {}
+    skill_born = {}
+    for place in assets.get("places", []):
+        for sk in place.get("skills", []):
+            skill_born[sk["name"]] = sk["created"]
+    for sk in assets.get("user_skills", []):
+        skill_born.setdefault(sk["name"], sk["created"])
+    rules_by_key = collections.defaultdict(list)
+    for p in prompts:
+        if p.get("rule"):
+            rules_by_key[p["rule"]].append(p)
+    area_cards = []
+    for i, ar in enumerate(analysis.get("areas", []), 1):
+        aps = [p for p in prompts if p.get("area") == ar.get("id")]
+        a_s, a_d = len({p["sid"] for p in aps}), len({p["date"] for p in aps})
+        a_t = r.dur(sum(p["active_min"] for p in aps))
+        existing = [n for n in ar.get("existing", []) if n in skill_born]
+        done_on = max((skill_born[n] for n in existing), default=None)
+        stages = "".join(f"<li>{E(r.tx(x))}</li>" for x in ar.get("stages", []))
+        rrows, after_n = [], 0
+        for rl in ar.get("rules", []):
+            ps = rules_by_key.get(rl.get("key"), [])
+            if not ps:
+                continue
+            after = sum(1 for p in ps if done_on and p["date"] > done_on)
+            after_n += 1 if after else 0
+            q = "<br>".join(E(p["text"][:90]) for p in ps[:2])
+            rrows.append((len({p['date'] for p in ps}), len(ps),
+                          f"<tr><td>{E(r.tx(rl.get('text')) or rl.get('key'))}</td><td class='num'>{len(ps)}</td>"
+                          f"<td class='num'>{len({p['date'] for p in ps})}</td><td class='num'>{max(p['date'] for p in ps)[5:]}</td>"
+                          f"<td class='ex'>{q}</td><td class='num {'up' if after else ''}'>{after if done_on else '–'}</td></tr>"))
+        rrows.sort(key=lambda x: (-x[0], -x[1]))
+        rhead = "".join(f"<th>{E(h)}</th>" for h in r.t("rule_cols"))
+        rules_html = (f"<p class='hint'>{r.t('rules_hint')}</p><table class='ev rules'><thead><tr>{rhead}</tr></thead>"
+                      f"<tbody>{''.join(x[2] for x in rrows)}</tbody></table>") if rrows else ""
+        ex_items = [r.t("existing_skill", n=E(n), c=skill_born[n]) for n in existing]
+        cwd_place = next((pl for pl in assets.get("places", []) if any(sk["name"] in existing for sk in pl["skills"])), None)
+        if cwd_place and cwd_place.get("claude_md"):
+            ex_items.append(r.t("existing_md", c=cwd_place["claude_md"]["created"]))
+        proj = collections.Counter(p["project"] for p in aps).most_common(1)
+        mems = [m for m in assets.get("memory", []) if proj and m["project"] == proj[0][0]]
+        if mems:
+            ex_items.append(r.t("existing_mem", n=len(mems), d=max(m["created"] for m in mems)))
+        existing_html = ("<ul class='evx'>" + "".join(f"<li>{x}</li>" for x in ex_items) + "</ul>") if ex_items else ""
+        if done_on and after_n:
+            existing_html += f"<p class='warn'>{r.t('after_note', n=after_n, d=done_on)}</p>"
+        prow = []
+        for sk in ar.get("skills", []):
+            holds = "".join(f"<li>{E(r.tx(x))}</li>" for x in sk.get("contains", []))
+            prow.append(f"<tr><td><code>{E(sk.get('name', ''))}</code></td><td>{E(r.tx(sk.get('purpose')))}</td>"
+                        f"<td><ul class='holds'>{holds}</ul></td><td class='muted'>{E(r.tx(sk.get('triggers')))}</td></tr>")
+        phead = "".join(f"<th>{E(h)}</th>" for h in r.t("prop_cols"))
+        prop_html = f"<table class='prop'><thead><tr>{phead}</tr></thead><tbody>{''.join(prow)}</tbody></table>" if prow else ""
+        prompt = r.tx(ar.get("prompt"))
+        mode = r.t("mode_extend") if ar.get("mode") == "extend" else r.t("mode_new")
+        note = r.tx(ar.get("note"))
+        area_cards.append(f"""
+<article class="cand area">
+  <header class="ch"><span class="rank">{i}</span><h3>{E(r.tx(ar.get('label')))}</h3><span class="badges"><span class="badge">{E(mode)}</span></span></header>
+  <p class="kind">{E(r.t('area_stats', s=a_s, d=a_d, p=len(aps), t=a_t))}{(' — ' + E(r.tx(ar.get('desc')))) if r.tx(ar.get('desc')) else ''}</p>
+  {('<div class="blk static"><h4>' + r.t('flow') + '</h4><div><ol class="flow">' + stages + '</ol></div></div>') if stages else ''}
+  {blk(r.t('rules'), rules_html, E(r.t('sum_rules', n=len(rrows)) + (r.t('sum_after', n=after_n) if done_on and after_n else '')))}
+  {blk(r.t('existing'), existing_html, E(r.t('sum_existing', s=len(existing), m=len(mems))))}
+  {blk(r.t('proposal'), prop_html, E(r.t('sum_skills', n=len(prow))))}
+  {blk(r.t('prompt'), ('<div class="prompt"><pre>' + E(prompt) + '</pre><button type="button" class="copy" data-done="' + E(r.t('copied')) + '">' + r.t('copy') + '</button></div>') if prompt else '', E(r.t('sum_prompt')), open_=True)}
+  {('<p class="note">' + E(note) + '</p>') if note else ''}
+</article>""")
+    sections.append(("areas", r.t("area_h"), r.t("area_lede"),
+                     "".join(area_cards) or f"<p class='muted'>{r.t('no_area')}</p>"))
 
     # ---- automation candidates
     cards = []
@@ -462,11 +587,11 @@ def build_page(r, prompts, sessions, tools, stats, insights, analysis, prev, his
     <div class="arrow" aria-hidden="true">→</div>
     <div class="a"><h4>{r.t('cand_auto')}</h4><p>{E(r.tx(c.get('approach')))}</p></div>
   </div>
-  <div class="blk"><h4>{r.t('cand_evidence')}</h4><div>{evidence}</div></div>
-  {('<div class="blk"><h4>' + r.t('quotes') + '</h4><div><ul class="quotes">' + qhtml + '</ul></div></div>') if qhtml else ''}
-  {('<div class="blk"><h4>' + r.t('design') + '</h4><div><dl class="design">' + design + '</dl></div></div>') if design else ''}
-  {('<div class="blk"><h4>' + r.t('success') + '</h4><div><ul class="succ">' + ''.join('<li>' + x + '</li>' for x in succ) + '</ul></div></div>') if succ else ''}
-  {('<div class="blk"><h4>' + r.t('prompt') + '</h4><div><p class="hint">' + r.t('prompt_hint') + '</p><div class="prompt"><pre>' + E(prompt) + '</pre><button type="button" class="copy" data-done="' + E(r.t('copied')) + '">' + r.t('copy') + '</button></div></div></div>') if prompt else ''}
+  {blk(r.t('cand_evidence'), evidence, E(r.t('sum_evidence', r=len(ev_rows), c=len(c.get('commands', [])))))}
+  {blk(r.t('quotes'), ('<ul class="quotes">' + qhtml + '</ul>') if qhtml else '', E(r.t('sum_quotes', n=len(quotes[:3]))))}
+  {blk(r.t('design'), ('<dl class="design">' + design + '</dl>') if design else '', E(r.tx(c.get('trigger'))))}
+  {blk(r.t('success'), ('<ul class="succ">' + ''.join('<li>' + x + '</li>' for x in succ) + '</ul>') if succ else '', E(r.t('sum_success', n=len(succ))))}
+  {blk(r.t('prompt'), ('<div class="prompt"><pre>' + E(prompt) + '</pre><button type="button" class="copy" data-done="' + E(r.t('copied')) + '">' + r.t('copy') + '</button></div>') if prompt else '', E(r.t('sum_prompt')), open_=True)}
   {('<p class="note">' + E(note) + '</p>') if note else ''}
 </article>""")
     sections.append(("candidates", r.t("cand_h"), r.t("cand_lede"),
@@ -568,12 +693,19 @@ def build_page(r, prompts, sessions, tools, stats, insights, analysis, prev, his
     if obs:
         sections.append(("notes", r.t("obs_h"), "", f"<ol class='obs'>{obs}</ol>"))
 
+    counts = {"areas": len(area_cards), "candidates": len(cards), "tasks": len(cat_order), "repeats": len(reps),
+              "friction": len(insights.get("friction") or []), "weekly": len(weeks), "commands": len(work_cmds),
+              "sessions": len(top_sessions), "notes": len(analysis.get("observations", []))}
     nav_names = r.t("nav")
     # ids carry the language so the two pages in one file don't collide
-    nav = "".join(f"<a href='#{r.lang}-{sid}' data-target='{r.lang}-{sid}'>{E(nav_names[sid])}</a>" for sid, *_ in sections)
-    nav += ("<span class='sp'></span><span class='langs'><button type='button' class='lang' data-set='ko'>한국어</button>"
-            "<button type='button' class='lang' data-set='en'>English</button></span>")
-    body = "\n".join(f"<section id='{r.lang}-{sid}'>{section(i, sid, title, lede, inner)}</section>"
+    nav = "<div class='links'>" + "".join(f"<a href='#{r.lang}-{sid}' data-target='{r.lang}-{sid}'>{E(nav_names[sid])}</a>"
+                                          for sid, *_ in sections) + "</div>"
+    # the controls sit outside the scrolling link strip so they never get cut off
+    nav += ("<div class='ctl'><span class='folds'><button type='button' class='fold' data-open='1'>"
+            + E(r.t("expand_all")) + "</button><button type='button' class='fold' data-open='0'>" + E(r.t("collapse_all"))
+            + "</button></span><span class='langs'><button type='button' class='lang' data-set='ko'>한국어</button>"
+            "<button type='button' class='lang' data-set='en'>English</button></span></div>")
+    body = "\n".join(f"<section id='{r.lang}-{sid}'>{section(i, sid, title, lede, inner, r.t('count', n=counts[sid]) if counts.get(sid) else '')}</section>"
                      for i, (sid, title, lede, inner) in enumerate(sections, 1))
     generated = dt.datetime.now().strftime("%Y-%m-%d %H:%M")
     scope_txt = r.t("scope", x=E(stats["project_filter"])) if stats.get("project_filter") else ""
@@ -615,13 +747,16 @@ font:16px/1.6 "Pretendard","Apple SD Gothic Neo","Noto Sans KR",-apple-system,"S
 word-break:keep-all;-webkit-font-smoothing:antialiased}
 .num{font-variant-numeric:tabular-nums lining-nums}
 nav.toc{position:sticky;top:0;z-index:10;background:var(--paper);border-bottom:2px solid var(--rule)}
-nav.toc .in{max-width:1120px;margin:0 auto;padding:0 20px;display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none}
-nav.toc .in::-webkit-scrollbar{display:none}
+nav.toc .in{max-width:1120px;margin:0 auto;padding:0 20px;display:flex;align-items:stretch;gap:12px}
+nav.toc .links{display:flex;flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent)}
+nav.toc .links::-webkit-scrollbar{display:none}
+nav.toc .ctl{display:flex;align-items:center;flex:none}
 nav.toc a{flex:none;font-size:14px;font-weight:600;color:var(--slate);text-decoration:none;padding:12px 12px 10px;
 border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
 nav.toc a:first-child{padding-left:0}
 nav.toc a:hover{color:var(--ink)} nav.toc a.on{color:var(--ink);border-bottom-color:var(--red)}
-nav.toc .sp{flex:1 0 16px}
+nav.toc .sp{display:none}
+@media (max-width:720px){nav.toc .folds{display:none}}
 nav.toc .langs{display:flex;align-items:center;gap:0;flex:none}
 nav.toc button.lang{font:inherit;font-size:13px;font-weight:600;color:var(--mute);background:none;border:0;padding:6px 8px;cursor:pointer}
 nav.toc button.lang+button.lang{border-left:1px solid var(--line)}
@@ -641,7 +776,15 @@ main{max-width:1120px;margin:0 auto;padding:40px 20px 80px}
 .kf span{display:block;font-size:14px;font-weight:700;margin-top:6px}
 .kf small{display:block;font-size:13px;color:var(--mute);margin-top:2px}
 @media (max-width:820px){.keyfigs{grid-template-columns:repeat(2,1fr)} .kf{border-right:0;margin-right:0;border-bottom:1px solid var(--line)}}
-section{margin-top:64px;scroll-margin-top:56px}
+section{margin-top:56px;scroll-margin-top:56px}
+details.sec>summary{list-style:none;cursor:pointer}
+details.sec>summary::-webkit-details-marker,details.blk>summary::-webkit-details-marker{display:none}
+.sh .meta{font-size:15px;font-weight:700;color:var(--mute)}
+.sh .tg{margin-left:auto;width:12px;height:12px;border-right:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);transform:rotate(45deg);position:relative;top:-4px;transition:transform .15s}
+details.sec:not([open])>summary .tg{transform:rotate(-45deg);top:0}
+details.sec:not([open])>summary{padding-bottom:12px}
+details.sec>summary:hover h2{text-decoration:underline;text-decoration-color:var(--red);text-decoration-thickness:3px;text-underline-offset:6px}
+.secbody{padding-top:4px}
 .sh{display:flex;align-items:baseline;gap:14px;border-top:4px solid var(--rule);padding-top:12px}
 .sh .no{font-size:15px;font-weight:800;color:var(--red)}
 .sh h2{font-size:28px;line-height:1.25;font-weight:800;letter-spacing:-.01em;margin:0}
@@ -684,10 +827,24 @@ td.up,.up{color:var(--up);font-weight:700} td.down,.down{color:var(--down);font-
 .cand .ba p{margin:0;font-size:16px}
 .cand .arrow{display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--red)}
 .cand .blk>div{min-width:0}
+.cand details.blk{display:block;padding:0;border-top:1px solid var(--line)}
+.cand details.blk>summary{display:grid;grid-template-columns:140px minmax(0,1fr);gap:12px;padding:12px 0;cursor:pointer;list-style:none;align-items:baseline}
+.cand details.blk>summary h4{margin:0;position:relative;padding-left:16px}
+.cand details.blk>summary h4::before{content:"";position:absolute;left:0;top:4px;width:6px;height:6px;border-right:2px solid var(--red);border-bottom:2px solid var(--red);transform:rotate(-45deg);transition:transform .15s}
+.cand details.blk[open]>summary h4::before{transform:rotate(45deg);top:2px}
+.cand details.blk>summary .sum{font-size:14px;color:var(--mute)}
+.cand details.blk[open]>summary .sum{visibility:hidden}
+.cand details.blk>summary:hover h4{color:var(--red)}
+.cand details.blk>.bd{margin:-4px 0 0 152px;padding-bottom:14px;min-width:0}
+.cand .blk.static h4{padding-left:16px}
+nav.toc .folds{display:flex;flex:none;margin-right:10px}
+nav.toc button.fold{font:inherit;font-size:13px;font-weight:600;color:var(--mute);background:none;border:0;padding:6px 8px;cursor:pointer}
+nav.toc button.fold:hover{color:var(--ink)}
 .cand .blk{display:grid;grid-template-columns:140px minmax(0,1fr);gap:12px;padding:12px 0;border-top:1px solid var(--line)}
 .cand .blk h4{margin:2px 0 0;color:var(--ink)}
 .cand table.ev{margin:0;font-size:14px;max-width:640px} .cand table.ev td,.cand table.ev th{padding:5px 8px}
 .cand table.ev thead th{font-size:12px}
+.cand table.rules thead th:first-child,.cand table.rules thead th:nth-child(5){text-align:left}
 .cand ul{margin:0;padding:0;list-style:none}
 .cand ul.evx{margin-top:6px;font-size:14px;color:var(--slate)} .cand ul.evx li{padding:1px 0}
 .cand ul.quotes li{color:var(--slate);padding:1px 0} .cand ul.quotes li::before{content:"“"} .cand ul.quotes li::after{content:"”"}
@@ -702,7 +859,17 @@ td.up,.up{color:var(--up);font-weight:700} td.down,.down{color:var(--down);font-
 .cand .prompt pre{margin:0;padding:12px 76px 12px 14px;white-space:pre-wrap;word-break:keep-all;font:14px/1.6 inherit;font-family:inherit}
 .cand .prompt button.copy{position:absolute;top:8px;right:8px;font:inherit;font-size:13px;font-weight:700;background:var(--ink);color:var(--paper);border:0;padding:4px 10px;cursor:pointer}
 .cand .note{font-size:14px;color:var(--mute);margin:12px 0 0}
-@media (max-width:720px){.cand .ba{grid-template-columns:1fr} .cand .arrow{transform:rotate(90deg);height:32px} .cand .blk{grid-template-columns:1fr;gap:4px} .cand dl.design{grid-template-columns:1fr}}
+@media (max-width:720px){.cand details.blk>summary{grid-template-columns:1fr;gap:2px} .cand details.blk>.bd{margin-left:0} .cand .ba{grid-template-columns:1fr} .cand .arrow{transform:rotate(90deg);height:32px} .cand .blk{grid-template-columns:1fr;gap:4px} .cand dl.design{grid-template-columns:1fr}}
+.cand.area .kind{margin-top:-8px}
+.cand ol.flow{display:flex;flex-wrap:wrap;gap:6px 0;margin:0;padding:0;list-style:none;counter-reset:st}
+.cand ol.flow li{counter-increment:st;font-size:14px;font-weight:600;padding:4px 10px;border:1.5px solid var(--ink);background:var(--paper)}
+.cand ol.flow li::before{content:counter(st) " ";color:var(--red);font-weight:800}
+.cand ol.flow li+li{margin-left:22px;position:relative}
+.cand ol.flow li+li::after{content:"→";position:absolute;left:-17px;top:3px;color:var(--red);font-weight:800}
+.cand table.prop{margin:0;font-size:14px} .cand table.prop td{padding:7px 8px;vertical-align:top}
+.cand table.prop thead th{font-size:12px;text-align:left!important}
+.cand ul.holds{margin:0;padding-left:16px;list-style:disc} .cand ul.holds li{padding:1px 0}
+.cand p.warn{margin:8px 0 0;font-size:14px;font-weight:700;color:var(--red)}
 .fric{padding:0 0 18px;margin:0 0 18px;border-bottom:1px solid var(--line)}
 .fric .cnt{font-size:15px;color:var(--red);margin-left:6px}
 .fric p{margin:6px 0} .fric ul{margin:4px 0 0;padding-left:18px;color:var(--slate)}
@@ -710,7 +877,7 @@ ol.obs{margin:0;padding-left:22px;font-size:17px} ol.obs li{padding:6px 0} ol.ob
 code{font-family:ui-monospace,Menlo,monospace;font-size:.88em;background:var(--zebra);padding:1px 4px}
 details.method{margin-top:64px;border-top:2px solid var(--rule);padding-top:12px;color:var(--slate);font-size:14px}
 details.method summary{cursor:pointer;font-weight:800;color:var(--ink)}
-@media print{nav.toc{display:none} section{break-inside:avoid-page}}
+@media print{nav.toc{display:none} section{break-inside:avoid-page} .sh .tg{display:none}}
 """
 
 JS = """
@@ -734,7 +901,7 @@ JS = """
     if (!('IntersectionObserver' in window)) return;
     var pg = document.querySelector('.pg[data-lang="' + root.dataset.lang + '"]');
     if (!pg) return;
-    var bar = pg.querySelector('nav.toc .in');
+    var bar = pg.querySelector('nav.toc .links');
     var links = pg.querySelectorAll('nav.toc a');
     var byId = {};
     links.forEach(function(a){ byId[a.dataset.target] = a; });
@@ -768,6 +935,22 @@ JS = """
       }
     });
   });
+  function openTarget(id){
+    var t = document.getElementById(id);
+    if (t) { var d = t.querySelector('details.sec'); if (d) d.open = true; }
+  }
+  document.querySelectorAll('nav.toc a').forEach(function(a){
+    a.addEventListener('click', function(){ openTarget(a.dataset.target); });
+  });
+  document.querySelectorAll('button.fold').forEach(function(b){
+    b.addEventListener('click', function(){
+      var open = b.dataset.open === '1';
+      b.closest('.pg').querySelectorAll('details').forEach(function(d){ d.open = open; });
+    });
+  });
+  window.addEventListener('beforeprint', function(){ document.querySelectorAll('details').forEach(function(d){ d.open = true; }); });
+  if (location.hash) openTarget(location.hash.slice(1));
+
   var saved = null;
   try { saved = localStorage.getItem('wpr-lang'); } catch (e) {}
   if (saved && document.querySelector('.pg[data-lang="' + saved + '"]')) setLang(saved); else spy();

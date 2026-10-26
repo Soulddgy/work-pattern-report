@@ -1,76 +1,95 @@
-S019	release
-S018	writing
-S017	feature
-S016	fix
-S015	feature
-S014	release
-S013	writing
-S012	feature
-S011	fix
-S010	feature
-S009	release
-S008	writing
-S007	feature
-S006	fix
-S005	feature
-S004	release
-S003	writing
-S002	feature
-S001	fix
-p0002		run tests
-p0003		commit & push
-p0004		deploy to staging
-p0005		update changelog
-p0007		match design spec
-p0008		run tests
-p0009		commit & push
-p0010		open PR & request review
-p0013		export cover image
-p0015		deploy to staging
-p0016		check server logs
-p0017		commit & push
-p0019		run tests
-p0020		open PR & request review
-p0021		update changelog
+S019	release	shop
+S018	writing	blog
+S017	feature	shop
+S016	fix	shop
+S015	feature	shop
+S014	release	shop
+S013	writing	blog
+S012	feature	shop
+S011	fix	shop
+S010	feature	shop
+S009	release	shop
+S008	writing	blog
+S007	feature	shop
+S006	fix	shop
+S005	feature	shop
+S004	release	shop
+S003	writing	blog
+S002	feature	shop
+S001	fix	shop
+p0002			never touch payment config
+p0003		run tests
+p0004		commit & push
+p0005		deploy to staging
+p0006		update changelog
+p0008		match design spec
+p0009			design tokens only
+p0010		run tests
+p0011		commit & push
+p0012		open PR & request review
+p0014			intro in three sentences
+p0015			only tested code
+p0016		export cover image
+p0017			cover without text
+p0019		deploy to staging
+p0020		check server logs
+p0021		commit & push
 p0023		run tests
-p0024		commit & push
-p0025		deploy to staging
-p0026		update changelog
-p0028		match design spec
-p0029		run tests
-p0030		commit & push
-p0031		open PR & request review
-p0034		export cover image
-p0036		deploy to staging
-p0037		check server logs
-p0038		commit & push
-p0040		run tests
-p0041		open PR & request review
-p0042		update changelog
-p0044		run tests
-p0045		commit & push
-p0046		deploy to staging
-p0047		update changelog
-p0049		match design spec
-p0050		run tests
-p0051		commit & push
-p0052		open PR & request review
-p0055		export cover image
-p0057		deploy to staging
-p0058		check server logs
-p0059		commit & push
-p0061		run tests
+p0024		open PR & request review
+p0025		update changelog
+p0027			never touch payment config
+p0028		run tests
+p0029		commit & push
+p0030		deploy to staging
+p0031		update changelog
+p0033		match design spec
+p0034			design tokens only
+p0035		run tests
+p0036		commit & push
+p0037		open PR & request review
+p0039			intro in three sentences
+p0040			only tested code
+p0041		export cover image
+p0042			cover without text
+p0044		deploy to staging
+p0045		check server logs
+p0046		commit & push
+p0048		run tests
+p0049		open PR & request review
+p0050		update changelog
+p0052			never touch payment config
+p0053		run tests
+p0054		commit & push
+p0055		deploy to staging
+p0056		update changelog
+p0058		match design spec
+p0059			design tokens only
+p0060		run tests
+p0061		commit & push
 p0062		open PR & request review
-p0063		update changelog
-p0065		run tests
-p0066		commit & push
-p0067		deploy to staging
-p0068		update changelog
-p0070		match design spec
-p0071		run tests
-p0072		commit & push
-p0073		open PR & request review
-p0076		export cover image
-p0078		deploy to staging
-p0079		check server logs
-p0080		commit & push
+p0064			intro in three sentences
+p0065			only tested code
+p0066		export cover image
+p0067			cover without text
+p0069		deploy to staging
+p0070		check server logs
+p0071		commit & push
+p0073		run tests
+p0074		open PR & request review
+p0075		update changelog
+p0077			never touch payment config
+p0078		run tests
+p0079		commit & push
+p0080		deploy to staging
+p0081		update changelog
+p0083		match design spec
+p0084			design tokens only
+p0085		run tests
+p0086		commit & push
+p0087		open PR & request review
+p0089			intro in three sentences
+p0091		export cover image
+p0092			cover without text
+p0094		deploy to staging
+p0095		check server logs
+p0096		commit & push

@@ -20,22 +20,28 @@ UNTIL = dt.date(2026, 10, 26)
 DAYS = 28
 SINCE = UNTIL - dt.timedelta(days=DAYS - 1)
 
-# (session title, project, type key, [(prompt text, repeat key or None)], insights facets or None)
+# (session title, project, type key, [(prompt text, repeat key or None[, rule key])], insights facets or None)
 SESSIONS = [
     ("Checkout page bug", "shop-web", "fix",
-     [("the coupon total is wrong on checkout, can you look", None), ("run the tests", "run tests"),
+     [("the coupon total is wrong on checkout, can you look", None),
+      ("don't touch the payment provider config, fix it on our side", None, "never touch payment config"),
+      ("run the tests", "run tests"),
       ("commit and push", "commit & push"), ("deploy to staging", "deploy to staging"),
       ("did you update the changelog?", "update changelog")],
      {"friction_counts": {"buggy_code": 2}, "outcome": "mostly_achieved",
       "user_satisfaction_counts": {"likely_satisfied": 3, "dissatisfied": 1}}),
     ("Product list filters", "shop-web", "feature",
      [("add a price filter to the product list", None), ("match the figma spacing", "match design spec"),
+      ("use the design tokens, no hard-coded colors", None, "design tokens only"),
       ("run the tests", "run tests"), ("commit and push", "commit & push"), ("open a PR", "open PR & request review")],
      {"friction_counts": {"misunderstood_request": 1}, "outcome": "fully_achieved",
       "user_satisfaction_counts": {"satisfied": 2, "likely_satisfied": 2}}),
     ("Weekly blog post", "blog", "writing",
-     [("draft this week's post about caching", None), ("make the intro shorter", None),
-      ("export the cover image at 1200x630", "export cover image")],
+     [("draft this week's post about caching", None),
+      ("the intro is too long again, three sentences max", None, "intro in three sentences"),
+      ("only show code you actually ran", None, "only tested code"),
+      ("export the cover image at 1200x630", "export cover image"),
+      ("no text on the cover", None, "cover without text")],
      {"friction_counts": {"wrong_approach": 2, "excessive_changes": 1}, "outcome": "mostly_achieved",
       "user_satisfaction_counts": {"dissatisfied": 2, "likely_satisfied": 2}}),
     ("Staging deploy failed", "shop-web", "release",
@@ -48,7 +54,13 @@ SESSIONS = [
       ("open a PR", "open PR & request review"), ("did you update the changelog?", "update changelog")],
      None),
 ]
+AREA = {"fix": "shop", "feature": "shop", "release": "shop", "writing": "blog"}
 TEXT_KO = {
+    "don't touch the payment provider config, fix it on our side": "결제사 설정은 건드리지 말고 우리 쪽에서 고쳐",
+    "use the design tokens, no hard-coded colors": "디자인 토큰 써, 색 하드코딩하지 말고",
+    "the intro is too long again, three sentences max": "도입부 또 길다, 세 문장 넘기지 마",
+    "only show code you actually ran": "직접 돌려 본 코드만 넣어",
+    "no text on the cover": "표지에 글자 넣지 마",
     "the coupon total is wrong on checkout, can you look": "결제 화면에서 쿠폰 합계가 틀려, 좀 봐줄래",
     "run the tests": "테스트 돌려줘", "commit and push": "커밋하고 푸시해", "deploy to staging": "스테이징에 배포해줘",
     "did you update the changelog?": "체인지로그 갱신했어?", "add a price filter to the product list": "상품 목록에 가격 필터 추가해줘",
@@ -149,6 +161,45 @@ DESIGN = [
 ]
 
 
+AREAS = [
+    {"id": "blog", "label": {"ko": "블로그 글쓰기", "en": "Blog writing"},
+     "desc": {"ko": "주제부터 게시까지 한 편", "en": "one post from topic to publish"},
+     "stages": [{"ko": "주제·개요", "en": "topic & outline"}, {"ko": "초안", "en": "draft"},
+                {"ko": "코드 예시 확인", "en": "check code samples"}, {"ko": "표지", "en": "cover"},
+                {"ko": "게시", "en": "publish"}],
+     "rules": [{"key": "intro in three sentences", "text": {"ko": "도입부는 세 문장 이내", "en": "intro in three sentences or fewer"}},
+               {"key": "cover without text", "text": {"ko": "표지에 글자를 넣지 않는다", "en": "no text on the cover"}},
+               {"key": "only tested code", "text": {"ko": "직접 실행해 본 코드만 싣는다", "en": "only publish code that was run"}}],
+     "existing": ["blog-post"], "mode": "extend",
+     "skills": [{"name": "blog-post", "purpose": {"ko": "초안 단계에 빠진 규칙 추가", "en": "add the rules missing from the draft stage"},
+                 "contains": [{"ko": "도입부 세 문장 이내", "en": "intro in three sentences or fewer"},
+                              {"ko": "코드 블록은 실행 결과를 붙인 것만", "en": "code blocks only with their run output"}],
+                 "triggers": {"ko": "\"이번 주 글\", \"초안 써줘\"", "en": "\"this week's post\", \"draft\""}},
+                {"name": "blog-cover", "purpose": {"ko": "표지 이미지 규격과 금지 사항", "en": "cover image size and don'ts"},
+                 "contains": [{"ko": "1200x630, 글자 없이", "en": "1200x630, no text"}],
+                 "triggers": {"ko": "\"표지\", \"커버 이미지\"", "en": "\"cover\", \"cover image\""}}],
+     "prompt": {"ko": "skill-creator 로 ~/blog/.claude/skills 의 blog-post 스킬에 '도입부 세 문장 이내', '코드 블록은 실행 결과를 붙인 것만'을 넣고, 표지용 blog-cover 스킬을 새로 만들어줘(1200x630, 글자 없음, \"표지\" \"커버 이미지\" 에 반응).",
+                "en": "Use skill-creator to add 'intro in three sentences or fewer' and 'code blocks only with their run output' to the blog-post skill in ~/blog/.claude/skills, and create a blog-cover skill (1200x630, no text; triggers on \"cover\", \"cover image\")."}},
+    {"id": "shop", "label": {"ko": "쇼핑몰 웹 개발", "en": "Shop web development"},
+     "desc": {"ko": "기능·버그 수정부터 스테이징 배포까지", "en": "features and fixes through to staging"},
+     "stages": [{"ko": "구현", "en": "implement"}, {"ko": "시안 맞추기", "en": "match the design"},
+                {"ko": "테스트", "en": "test"}, {"ko": "커밋·PR", "en": "commit & PR"}, {"ko": "스테이징 배포", "en": "staging deploy"}],
+     "rules": [{"key": "never touch payment config", "text": {"ko": "결제사 설정은 건드리지 않는다", "en": "never touch the payment provider config"}},
+               {"key": "design tokens only", "text": {"ko": "색은 디자인 토큰만 쓴다", "en": "colors come from design tokens only"}}],
+     "existing": [], "mode": "new",
+     "skills": [{"name": "shop-feature", "purpose": {"ko": "구현과 시안 맞추기 기준", "en": "standards for building and matching the design"},
+                 "contains": [{"ko": "색은 디자인 토큰만", "en": "colors from design tokens only"},
+                              {"ko": "결제사 설정 수정 금지", "en": "no changes to payment provider config"}],
+                 "triggers": {"ko": "\"기능 추가\", \"시안대로\"", "en": "\"add a feature\", \"match the design\""}}],
+     "prompt": {"ko": "skill-creator 로 shop-web/.claude/skills 에 shop-feature 스킬을 만들어줘. 색은 디자인 토큰만 쓰고, 결제사 설정은 절대 건드리지 않는다는 규칙을 넣고, \"기능 추가\" \"시안대로\" 에 반응하게.",
+                "en": "Use skill-creator to create a shop-feature skill in shop-web/.claude/skills: colors from design tokens only, never touch the payment provider config; triggers on \"add a feature\", \"match the design\"."}},
+]
+ASSETS = {"places": [{"cwd": "~/blog", "skills": [{"name": "blog-post", "description": "", "created": (SINCE + dt.timedelta(days=9)).isoformat(),
+                                                    "modified": (SINCE + dt.timedelta(days=9)).isoformat()}], "claude_md": None}],
+          "user_skills": [], "memory": [{"project": "blog", "file": "intro.md", "name": "intro", "description": "",
+                                          "created": (SINCE + dt.timedelta(days=3)).isoformat()}]}
+
+
 def bilingual_analysis():
     ko, en = ANALYSIS["ko"], ANALYSIS["en"]
     fr = [{"type": a["type"], "title": bi(a["title"], b["title"]), "desc": bi(a["desc"], b["desc"]),
@@ -162,7 +213,8 @@ def bilingual_analysis():
     return {"categories": [{"name": k, "label": bi(TYPES["ko"][k][0], TYPES["en"][k][0]),
                             "desc": bi(TYPES["ko"][k][1], TYPES["en"][k][1])} for k in TYPES["en"]],
             "repeats": [{"key": k, "label": bi(KEYS["ko"][k], KEYS["en"][k])} for k in KEYS["en"]],
-            "frictions": fr, "candidates": cands, "observations": bi(ko["observations"], en["observations"])}
+            "frictions": fr, "candidates": cands, "observations": bi(ko["observations"], en["observations"]),
+            "areas": AREAS}
 
 
 def build(lang, out):
@@ -179,7 +231,11 @@ def build(lang, out):
             start = dt.datetime.combine(day, dt.time(9 + si, 0), KST)
             ts = start
             n0 = len(prompts)
-            for text, rk in items:
+            for item in items:
+                text, rk = item[0], item[1]
+                rule = item[2] if len(item) > 2 else None
+                if week == 3 and rule == "only tested code":
+                    rule, text = None, "draft the next post outline"  # one rule shows up less often
                 text = TEXT_KO.get(text, text) if lang == "ko" else text
                 ts += dt.timedelta(minutes=rnd.randint(6, 25))
                 pid += 1
@@ -189,10 +245,10 @@ def build(lang, out):
                      "active_min": rnd.choice([10, 15, 20, 25])}
                 prompts.append(p)
                 by_day[day.isoformat()] = by_day.get(day.isoformat(), 0) + 1
-                if rk:
-                    labels.append(f"{p['id']}\t\t{rk}")
+                if rk or rule:
+                    labels.append(f"{p['id']}\t\t{rk or ''}\t{rule or ''}".rstrip("\t"))
             n = len(prompts) - n0
-            labels.insert(0, f"{sid}\t{tkey}")
+            labels.insert(0, f"{sid}\t{tkey}\t{AREA[tkey]}")
             s = {"sid": sid, "id": f"sample-{sid}", "project": proj, "title": title, "start": start.isoformat(),
                  "end": ts.isoformat(), "prompts": n, "compacts": 0,
                  "active_min": sum(p["active_min"] for p in prompts[n0:]), "tools": {}, "commands": {}, "skills": {}}
@@ -235,6 +291,7 @@ def build(lang, out):
     an = bilingual_analysis()
     an["lang"] = lang
     json.dump(an, open(os.path.join(out, "analysis.json"), "w"), ensure_ascii=False)
+    json.dump(ASSETS, open(os.path.join(out, "assets.json"), "w"), ensure_ascii=False)
     # a previous run so the "since last run" table has something to show
     prev = {"since": "2026-08-31", "until": "2026-09-27", "days": DAYS, "scope": "", "prompts": 61,
             "generated": "2026-09-27T18:00",

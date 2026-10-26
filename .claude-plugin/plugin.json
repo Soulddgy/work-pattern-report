@@ -1,7 +1,7 @@
 {
   "name": "work-pattern-report",
-  "description": "A companion to Claude Code's built-in /insights. Counts how often and on how many days you asked for the same thing, which commands Claude actually ran, and where sessions got stuck, then turns those counts into automation candidates in a local HTML report (Korean or English). Later runs show whether the repeats went down. /insights 보완용 한국어·영어 작업 패턴 리포트.",
-  "version": "0.1.1",
+  "description": "Finds the areas of your work where you keep giving Claude the same corrections and running the same multi-step flow, and proposes the skills to build for them, with the rules quoted from what you said and a prompt that builds them. Reads your local Claude Code history, /insights analysis and the skills, CLAUDE.md and memory you already have, and points out rules missing from existing skills. Also lists small command/hook automations and tracks whether repeats go down. Local HTML report in Korean or English. 어느 업무 영역에 스킬을 만들지 알려 주는 한국어·영어 리포트.",
+  "version": "0.2.0",
   "author": {
     "name": "Soul Kim",
     "url": "https://github.com/Soulddgy"
@@ -16,7 +16,9 @@
     "automation",
     "analytics",
     "retrospective",
-    "korean"
+    "korean",
+    "skills",
+    "skill-recommendation"
   ],
   "homepage": "https://github.com/Soulddgy/work-pattern-report",
   "repository": "https://github.com/Soulddgy/work-pattern-report"

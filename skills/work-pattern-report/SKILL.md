@@ -1,15 +1,19 @@
 ---
 name: work-pattern-report
-description: A companion to Claude Code's built-in /insights. Reads your local Claude Code transcripts (~/.claude/projects) and the per-session analysis /insights leaves in ~/.claude/usage-data, counts how often you asked for the same thing and on how many days, which commands Claude actually ran, and where sessions got stuck, then turns those counts into automation candidates in a local HTML report (Korean or English). On later runs it shows whether those repeats went down. Use it for "what do I spend my Claude time on", "find repetitive work I could automate", "work pattern report", "weekly/monthly retro", "did that skill actually reduce my repeats", "insights in Korean", "내가 무슨 작업 많이 하는지", "작업 패턴 분석", "반복 작업 찾아줘", "자동화할 만한 거", "주간 회고", "지난번보다 줄었나". When someone asks for automation ideas, count their records with this skill instead of answering from memory. Not for git commit statistics or GitHub contribution stats of a single repository.
+description: Finds the areas of your work where Claude keeps needing the same corrections and the same multi-step flow, and proposes the skills to build for them, the way you'd package a video pipeline into copy / generation / edit / review skills once you notice you keep telling Claude the same rules. Reads your local Claude Code transcripts (~/.claude/projects), what /insights left in ~/.claude/usage-data, and the skills, CLAUDE.md and memory you already have; counts sessions, days, restated rules and repeated requests; and writes a local HTML report (Korean/English) with a proposed skill set per area, the rules to put in it quoted from what you said, and a prompt that builds it. Also lists smaller command/hook automations and, on later runs, whether repeats went down. Use for "what skills should I make", "where should I make a skill", "what do I keep telling Claude", "work pattern report", "find repetitive work", "weekly/monthly retro", "did my skills help", "어떤 스킬을 만들면 좋을까", "내가 무슨 작업 많이 하는지", "작업 패턴 분석", "반복 작업 찾아줘", "자동화할 만한 거", "주간 회고", "지난번보다 줄었나". When someone asks for skill or automation ideas, count their records with this skill instead of answering from memory. Not for git commit statistics or GitHub contribution stats of a single repository.
 ---
 
-# Work Pattern Report (an /insights companion)
+# Work Pattern Report — which skills to build
 
-`/insights` summarizes each session's goal, outcome and friction well, but it does not count **how many times, on how many days, you asked for the same thing**, or **which commands Claude actually ran**. This skill counts both, folds in the /insights analysis, and renders one local HTML page.
+People who use Claude a lot end up building **work-area skills**: after weeks of making short videos, someone notices they keep telling Claude the same things (which shots are allowed, how captions are worded, how a cut is built, which checks to run before spending credits) and packages that into a set of skills, one per stage of the work. This skill finds where that is worth doing **before** the person notices, from their own records:
 
-The point is to decide what to automate from **counts**, not impressions, and to check on the next run whether an automation actually reduced the repeats. Every claim in the report must be backed by a number counted from the records.
+1. **Work-area skill candidates — the main output.** An area is a body of work with its own flow and standards (a product's short-form videos, an app's device testing, compliance documents, a resume). An area qualifies when the same multi-step flow ran on many days and the person kept stating the same rules while correcting Claude. For each one the report shows the flow, the rules with their own words and dates, what already exists (skills, CLAUDE.md, memory) and which rules came back after it existed, a proposed set of skills, and a prompt that builds them.
+2. **Small automations.** Single mechanical steps asked for again and again (build and copy an artifact, commit and push), as a command, hook or script.
+3. Supporting counts: task types, repeated requests, commands Claude ran, `/insights` friction, change since the last run.
 
-**Do not redo what /insights already does.** Session goals, outcomes and friction come straight from its facets. CLAUDE.md suggestions are its job too. This skill focuses on repeats, commands, change over time, and the automation candidates those support.
+Every claim must be backed by a number counted from the records. **Judgment and taste are in scope for area skills**: the point of such a skill is to hold the person's standards so Claude stops needing the same correction. (They are out of scope for small automations.)
+
+**Do not redo what /insights already does.** Session goals, outcomes and friction come straight from its facets, and CLAUDE.md line suggestions are its job.
 
 ## Language
 
@@ -60,8 +64,15 @@ Outputs:
 - `tools.json` — Bash command signatures (`git commit`, `npm test`, `gradlew assemble*`, …), skills, MCP servers
 - `stats.json` — prompts per day/week/project, active time, the previous same-length window
 - `batches/batch-NN.txt` — prompts to label, grouped by session; each session header has its title and, when /insights analyzed it, an `# insights goal:` line
+- `assets.json` — what the person already built where they work: project skills (`<project>/.claude/skills`) and user skills with their creation dates, CLAUDE.md, and memory notes per project with dates
 
-### 2. Choose task types
+Claude Code deletes transcripts older than `cleanupPeriodDays` (30 by default), so a window longer than that sees only what is left. If the user wants longer history from now on, tell them they can raise that setting.
+
+### 2. Choose work areas and task types
+
+**Work areas (2–6).** Group sessions into the bodies of work they belong to, using titles, `cwd`, project names and `/insights` goals: usually a product or project plus the kind of work, e.g. `brand short-form videos`, `app device testing`, `regulatory documents`, `resume & job search`. One-off sessions get no area. Give each a short id in the user's language.
+
+**Task types.**
 
 Skim the titles and `facets.underlying_goal` / `brief_summary` in `sessions.json` and pick **7–12 task types**. Because /insights already summarized each session's goal, you can usually settle the types before reading every batch.
 
@@ -78,13 +89,16 @@ If one type exceeds 30%, see whether it splits. Give each type a one-line descri
 Write `<work folder>/labels/batch-NN.tsv` for each batch, tab-separated:
 
 ```
-S012	PR, review, merge
+S012	PR, review, merge	app development
 p0130	build & release	build debug artifact → Downloads
 p0131		ask for a review comment
+p0207			no compositing of real product photos
 ```
 
-- `S###` lines set the session's default type. Write exactly one for every session; most prompts need nothing more.
-- Write a `p####` line only when the prompt is clearly a different type from the session default (second column), or when it gets a repeat key (third column). Do not write a line for every prompt; it costs tokens and changes nothing.
+- `S###` lines set the session's default type (second column) and its work area (third column, blank for one-offs). Write exactly one for every session; most prompts need nothing more.
+- Write a `p####` line only when the prompt is clearly a different type from the session default (second column), gets a repeat key (third column), or states a rule (fourth column). Do not write a line for every prompt.
+
+**Rules (fourth column) drive the area skills.** A rule is a standard the person states about *how* the work in that area must be done: a correction ("the product looks pasted on, don't composite real photos"), a preference ("feed posts are 4:5, no black bars"), a constraint ("don't reuse the same model's face in every video"), a quality bar or a reason for rejecting a result ("there's no action, it's just a zoom — redo"). Write it as a short imperative in the user's language, and give the same rule the same key every time it comes back, on any day. Questions, approvals ("ok, go") and one-time instructions for a single file are not rules.
 
 **Repeat keys are the core of this report.** When a request with the same intent comes back on another day or in another session, give it the same key.
 - Name them as short "action → result" phrases, e.g. `build debug artifact → Downloads`, `commit & push`, `update the notes app`, `ask for a review comment`, `install on test device`, `log in with the test account`.
@@ -138,9 +152,38 @@ Run the renderer once without `--history` (so nothing is recorded) to see counts
 }
 ```
 
+**areas** — the main output. Add this to `analysis.json`:
+
+```json
+"areas": [{
+  "id": "브랜드 숏폼", "label": {"ko": "브랜드 숏폼 영상", "en": "brand short-form videos"},
+  "desc": {"ko": "기획부터 게시까지 숏폼 한 편", "en": "one short video from idea to post"},
+  "stages": [{"ko": "기획·카피", "en": "concept & copy"}, {"ko": "AI 영상 생성", "en": "AI video generation"},
+             {"ko": "검수", "en": "review"}, {"ko": "편집·빌드", "en": "edit & build"}, {"ko": "게시 문구", "en": "post copy"}],
+  "rules": [{"key": "실사 누끼 합성 금지", "text": {"ko": "실사 누끼를 합성하지 않는다", "en": "don't composite cut-out product photos"}}],
+  "existing": ["shorts-generate", "shorts-edit"],
+  "mode": "extend",
+  "skills": [{"name": "shorts-generate", "purpose": {"ko": "…", "en": "…"},
+              "contains": [{"ko": "실사 누끼 합성 금지 — 제품 컷은 생성 도구가 그리게", "en": "…"}],
+              "triggers": {"ko": "\"이 컷 만들어줘\", \"착용 씬\"", "en": "…"}}],
+  "prompt": {"ko": "skill-creator 로 …", "en": "Use skill-creator to …"},
+  "note": {"ko": "…", "en": "…"}
+}]
+```
+
+How to fill it:
+- **Which areas.** Rank by days active × distinct rules restated. An area needs work on at least ~3 different days and either ~3 or more rules or a flow of 3+ stages that keeps repeating. List 1–4 areas; an area with nothing to propose stays out.
+- **stages** — the flow as it actually ran in those sessions, 3–6 stages, in order.
+- **rules** — every rule key of this area that came up on 2+ days, or once with an explicit "always/never". The report counts them, shows the quotes and dates, and marks those that came back after the area's existing skills were created.
+- **existing / mode** — look in `assets.json` for skills that cover this area (the project's `.claude/skills`, user skills) and list their exact names; then `mode` is `extend`. Also note CLAUDE.md and memory: a rule that sits in memory or CLAUDE.md but keeps being restated isn't being applied when it matters, and belongs in the skill that is loaded for that stage. With nothing there, `mode` is `new`.
+- **skills** — the set to build (`new`) or the changes to make (`extend`). Split a large area by stage when stages differ in inputs, tools or standards (concept & copy / generation / edit / review are separate skills in a video pipeline), and add a small entry skill that routes between them only when there are 3+. Name them `<area>-<stage>` in kebab-case. `contains` lists concrete content — the actual rules by name, file and folder conventions, verified commands or prompt patterns, the checks to run before spending money or time. `triggers` uses phrases the person actually typed. For `extend`, list only skills that change and only what to add.
+- **prompt** — one paragraph telling Claude Code to build exactly this with the skill-creator skill: where (`<project>/.claude/skills/`), which skills, what each holds (the rules spelled out), and their triggers. In both languages.
+
 **frictions** — read `facets.friction_counts` and `friction_detail` in `sessions.json` and describe the 2–4 most frequent friction types of this window, in both languages. Keep `type` as /insights' key (the report adds the count). `examples` are short restatements of what `friction_detail` actually says; don't invent new ones.
 
-**How to pick automation candidates.** Someone reading the report should be able to decide what to build next.
+**Small automations** (`candidates`) come after the areas and are deliberately narrower: one mechanical step or chain, as a command, hook or script. Leave out anything an area skill already covers, and keep this list short (0–4).
+
+**How to pick small automations.** Someone reading the report should be able to decide what to build next.
 - Every candidate needs evidence. Link counts through `repeat_keys` or `commands`; leave out candidates without numbers. The report quotes the user's own words from the linked repeat keys, so the link is also the quote.
 - Add `friction_types` when the candidate addresses a friction; the report counts that friction across the sessions where the linked repeats occurred.
 - Weigh **days** above raw count. Ten times in one day can be one task being reworked; five different days is a habit.
@@ -148,7 +191,7 @@ Run the renderer once without `--history` (so nothing is recorded) to see counts
 - Check for overlap with what exists: `~/.claude/skills/`, hooks in `~/.claude/settings.json`, the project's `.claude/`, scheduled routines. If it overlaps, write "extend X" instead of "build new". If a previous candidate was already built, say in the observations whether its repeat went down in the comparison table.
 - `effort` is how much it takes to build: `S` one file, under an hour (a hook, a short script, a skill with fixed steps); `M` half a day to a day, a few places touched (a skill tying several tools together, extending an existing skill); `L` days, or needs design or team agreement (CI changes, cross-repo work). The report spells these out in words.
 - `type` is the form it would take: skill, hook, script, scheduled routine, CI, or a settings change. If a step must keep human approval (commit, merge, publishing), say "keeps the approval step" in `approach`.
-- 3–6 candidates, highest payoff first.
+- At most 4, highest payoff first.
 
 **Make each candidate buildable, not just a direction.** The reader should be able to copy the prompt and get a working automation. Fill these for every candidate:
 - `trigger` — what starts it: a command the user types (`/name`), a hook event (`PreToolUse` on `git commit`, `Stop`, …), a schedule, or CI on push/PR.
@@ -176,8 +219,8 @@ open <report.html>        # macOS; use xdg-open on Linux, start on Windows
 
 Don't paste the report into chat. Say briefly:
 - window and size (prompts, active time, sessions) and /insights coverage
-- the top 2–3 task types and their share
-- the top 3 automation candidates, one line each, with their numbers
+- the work-area skill candidates, one line each: the area, sessions and days, how many rules kept coming back, and the proposed skills (or what to add to existing ones)
+- the top small automations in one line
 - any repeat that changed a lot since last run, in one line
 - the full path of the report file
 - one thing worth building next, as an offer; don't build it unprompted

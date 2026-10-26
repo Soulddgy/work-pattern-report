@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 — 2026-10-26
+
+- **Work-area skill candidates are now the main output.** The skill groups sessions into work areas, tags the rules you state while correcting the work (corrections, preferences, constraints, reasons for rejecting a result) and proposes a set of skills per area: the flow, the rules in your own words with dates, a proposed skill split by stage, and a build prompt for skill-creator.
+- Reads what you already built (project and user skills with their creation dates, CLAUDE.md, per-project memory). Where skills exist it proposes what to add, and counts rules that came back after the skills were created.
+- The earlier automation candidates become "Small automations" (commands, hooks, scripts), capped at four.
+- Report: foldable sections and blocks (build prompts start open), expand/collapse all, nav controls that stay visible on narrow screens, rules table.
+- Sample data now includes work areas.
+- README rewritten around skill recommendations; notes on the 30-day transcript retention.
+
 ## 0.1.1 — 2026-10-26
 
 - When the /insights analysis is stale (no data, last run more than 7 days before the window end, or under half the window's prompts covered), the skill now stops and asks you to run `/insights` first, then picks up the new data when you say continue. `/insights` can only be run by the user, so the skill asks instead of running it.
