@@ -55,7 +55,7 @@ LABELS = {
 
 T = {
     "ko": {
-        "title": "작업 패턴 리포트",
+        "title": "스킬로 만들 업무",
         "subtitle": "{since} ~ {until} · {days}일{scope}",
         "meta": "Claude Code 대화 기록과 /insights 분석으로 만든 로컬 파일 · {gen}",
         "scope": " · 범위 {x}",
@@ -128,7 +128,7 @@ T = {
         "method": "~/.claude/projects 의 세션 기록에서 사람이 직접 입력한 메시지(제안 수락·대기열 포함)만 셌습니다. 서브에이전트 대화, 시스템 알림, /compact 뒤 자동으로 붙는 요약은 뺐습니다. 작업 시간은 요청 하나부터 다음 요청 전까지 기록이 찍힌 5분 칸 수라, 자리를 비운 시간은 빠지고 Claude가 혼자 오래 돈 시간은 들어갑니다. 작업 유형과 반복 요청은 Claude가 세션 제목과 메시지를 읽고 붙인 분류입니다. 막힌 지점·세션 결과는 /insights 가 세션마다 남긴 분석(~/.claude/usage-data/facets)을 그대로 모은 것입니다. 실제 문장 인용과 세션 제목은 원문 그대로입니다.",
     },
     "en": {
-        "title": "Work Pattern Report",
+        "title": "Work to Skills",
         "subtitle": "{since} – {until} · {days} days{scope}",
         "meta": "Local file built from Claude Code transcripts and /insights analysis · {gen}",
         "scope": " · scope {x}",

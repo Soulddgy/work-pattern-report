@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 — 2026-10-26
+
+- **Renamed from work-pattern-report to work-to-skills**, since the main output is now the set of skills to build per work area. Install again with the new name: `/plugin marketplace add Soulddgy/work-to-skills` and `/plugin install work-to-skills@work-to-skills`. The old GitHub URL redirects.
+- Reports and run history now go to `~/Documents/work-to-skills/`. To keep the "since last run" comparison, move your old `~/Documents/work-pattern-report/` folder there.
+- Report title is now "Work to Skills" / "스킬로 만들 업무".
+
 ## 0.2.1 — 2026-10-26
 
 - No longer reads `~/.claude/settings.json`. It was only used to check for overlapping hooks, and it can hold API keys, so the directory scanner flagged it. The overlap check now covers skills, CLAUDE.md and scheduled routines.

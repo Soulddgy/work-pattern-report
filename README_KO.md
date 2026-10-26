@@ -1,6 +1,6 @@
-# work-pattern-report
+# work-to-skills
 
-**버전 0.2.1** (2026-10-26) · [변경 내역](CHANGELOG.md) · MIT · [English](README.md) · **한국어**
+**버전 0.3.0** (2026-10-26) · [변경 내역](CHANGELOG.md) · MIT · [English](README.md) · **한국어**
 
 내 Claude Code 사용 기록을 보고 **어느 업무 영역에 스킬을 만들면 좋을지** 알려 주는 Claude Code 플러그인입니다.
 
@@ -22,7 +22,7 @@ Claude를 오래 쓰다 보면 같은 일을 할 때마다 같은 말을 반복�
 
 ## `/insights` 와의 차이
 
-| | `/insights` | work-pattern-report |
+| | `/insights` | work-to-skills |
 |---|---|---|
 | 세션 목표·결과·막힌 지점 | ✅ | `/insights` 결과를 가져와 씀 |
 | 어느 업무 영역에 어떤 스킬을 만들지 | — | ✅ 규칙·흐름 근거와 만들기 프롬프트 |
@@ -34,8 +34,8 @@ Claude를 오래 쓰다 보면 같은 일을 할 때마다 같은 말을 반복�
 ## 설치
 
 ```text
-/plugin marketplace add Soulddgy/work-pattern-report
-/plugin install work-pattern-report@work-pattern-report
+/plugin marketplace add Soulddgy/work-to-skills
+/plugin install work-to-skills@work-to-skills
 ```
 
 필요한 것: Claude Code, Python 3.9 이상.
@@ -51,7 +51,7 @@ Claude를 오래 쓰다 보면 같은 일을 할 때마다 같은 말을 반복�
 - "my-app 만 놓고 10월 작업 패턴 분석해줘"
 - "최근 2주를 그 전 2주랑 비교해서 반복이 줄었는지 보여줘"
 
-결과는 `~/Documents/work-pattern-report/` 에 생깁니다. 미리 보고 싶으면 [`examples/sample-report.ko.html`](examples/sample-report.ko.html) 을 내려받아 열어 보세요(가짜 데이터).
+결과는 `~/Documents/work-to-skills/` 에 생깁니다. 미리 보고 싶으면 [`examples/sample-report.ko.html`](examples/sample-report.ko.html) 을 내려받아 열어 보세요(가짜 데이터).
 
 ## 개인정보와 접근 범위
 
@@ -60,7 +60,7 @@ Claude를 오래 쓰다 보면 같은 일을 할 때마다 같은 말을 반복�
 | | |
 |---|---|
 | **읽는 것** | `~/.claude/projects/*/*.jsonl`(Claude Code 대화 기록)과 프로젝트별 메모리(`~/.claude/projects/*/memory/`), `~/.claude/usage-data/`(`/insights` 가 남긴 분석), 이미 만든 것을 확인하려고 `~/.claude/skills/`, 작업 폴더의 `.claude/skills/` 와 `CLAUDE.md`. 설정 파일이나 인증 정보 파일은 읽지 않습니다 |
-| **쓰는 것** | `~/Documents/work-pattern-report/`(리포트, 중간 데이터, 실행 기록) 또는 지정한 폴더만 |
+| **쓰는 것** | `~/Documents/work-to-skills/`(리포트, 중간 데이터, 실행 기록) 또는 지정한 폴더만 |
 | **실행하는 것** | 들어 있는 Python 스크립트 두 개(`extract.py`, `render.py`, 표준 라이브러리만)와 리포트를 여는 `open` / `xdg-open` / `start` |
 | **네트워크** | 없음. 스크립트는 네트워크 요청을 하지 않고, 리포트도 인터넷에서 아무것도 불러오지 않습니다 |
 | **Claude를 통해** | 요청을 분류하려고 Claude가 세션 안에서 요청 묶음을 읽습니다. 평소 파일을 읽어 달라고 할 때와 같은 방식입니다 |

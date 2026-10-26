@@ -1,9 +1,9 @@
 ---
-name: work-pattern-report
-description: Finds the areas of your work where Claude keeps needing the same corrections and the same multi-step flow, and proposes the skills to build for them, the way you'd package a video pipeline into copy / generation / edit / review skills once you notice you keep telling Claude the same rules. Reads your local Claude Code transcripts (~/.claude/projects), what /insights left in ~/.claude/usage-data, and the skills, CLAUDE.md and memory you already have; counts sessions, days, restated rules and repeated requests; and writes a local HTML report (Korean/English) with a proposed skill set per area, the rules to put in it quoted from what you said, and a prompt that builds it. Also lists smaller command/hook automations and, on later runs, whether repeats went down. Use for "what skills should I make", "where should I make a skill", "what do I keep telling Claude", "work pattern report", "find repetitive work", "weekly/monthly retro", "did my skills help", "어떤 스킬을 만들면 좋을까", "내가 무슨 작업 많이 하는지", "작업 패턴 분석", "반복 작업 찾아줘", "자동화할 만한 거", "주간 회고", "지난번보다 줄었나". When someone asks for skill or automation ideas, count their records with this skill instead of answering from memory. Not for git commit statistics or GitHub contribution stats of a single repository.
+name: work-to-skills
+description: Finds the areas of your work where Claude keeps needing the same corrections and the same multi-step flow, and proposes the skills to build for them, the way you'd package a video pipeline into copy / generation / edit / review skills once you notice you keep telling Claude the same rules. Reads your local Claude Code transcripts (~/.claude/projects), what /insights left in ~/.claude/usage-data, and the skills, CLAUDE.md and memory you already have; counts sessions, days, restated rules and repeated requests; and writes a local HTML report (Korean/English) with a proposed skill set per area, the rules to put in it quoted from what you said, and a prompt that builds it. Also lists smaller command/hook automations and, on later runs, whether repeats went down. Use for "what skills should I make", "where should I make a skill", "what do I keep telling Claude", "work to skills", "work pattern report", "find repetitive work", "weekly/monthly retro", "did my skills help", "어떤 스킬을 만들면 좋을까", "내가 무슨 작업 많이 하는지", "작업 패턴 분석", "반복 작업 찾아줘", "자동화할 만한 거", "주간 회고", "지난번보다 줄었나". When someone asks for skill or automation ideas, count their records with this skill instead of answering from memory. Not for git commit statistics or GitHub contribution stats of a single repository.
 ---
 
-# Work Pattern Report — which skills to build
+# work-to-skills — which skills to build
 
 People who use Claude a lot end up building **work-area skills**: after weeks of making short videos, someone notices they keep telling Claude the same things (which shots are allowed, how captions are worded, how a cut is built, which checks to run before spending credits) and packages that into a set of skills, one per stage of the work. This skill finds where that is worth doing **before** the person notices, from their own records:
 
@@ -31,9 +31,9 @@ Transcripts can contain source code, credentials, internal emails and security f
 |---|---|---|
 | Window | last 30 days including today | "this week", "October only", "everything" |
 | Scope | all projects | "only my-app", "skip the blog" |
-| Report | `~/Documents/work-pattern-report/report_<since>_<until>.html` | any path they name |
-| Work folder | `~/Documents/work-pattern-report/data/<since>_<until>/` | — |
-| Run history | `~/Documents/work-pattern-report/history.json` | — |
+| Report | `~/Documents/work-to-skills/report_<since>_<until>.html` | any path they name |
+| Work folder | `~/Documents/work-to-skills/data/<since>_<until>/` | — |
+| Run history | `~/Documents/work-to-skills/history.json` | — |
 
 "Everything" is `--since 2020-01-01`. A project filter is `--project` with part of the project directory name (for example `my-app`). For "skip X", extract everything, ignore X while labeling and interpreting, and say so in the observations.
 

@@ -1,16 +1,16 @@
 {
-  "name": "work-pattern-report",
-  "description": "Work Pattern Report: an /insights companion skill for Claude Code (Korean/English).",
+  "name": "work-to-skills",
+  "description": "work-to-skills: finds which areas of your Claude Code work deserve a set of skills (Korean/English).",
   "owner": {
     "name": "Soul Kim",
     "url": "https://github.com/Soulddgy"
   },
   "plugins": [
     {
-      "name": "work-pattern-report",
+      "name": "work-to-skills",
       "source": "./",
       "description": "Finds which areas of your work deserve a skill — from the rules you keep restating and the flows you keep repeating — and gives you a prompt that builds them. Local report in Korean/English.",
-      "version": "0.2.1"
+      "version": "0.3.0"
     }
   ]
 }

@@ -14,7 +14,7 @@ import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-RENDER = os.path.join(HERE, "..", "skills", "work-pattern-report", "scripts", "render.py")
+RENDER = os.path.join(HERE, "..", "skills", "work-to-skills", "scripts", "render.py")
 KST = dt.timezone(dt.timedelta(hours=9))
 UNTIL = dt.date(2026, 10, 26)
 DAYS = 28

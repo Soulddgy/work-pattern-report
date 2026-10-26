@@ -1,6 +1,6 @@
-# work-pattern-report
+# work-to-skills
 
-**Version 0.2.1** (2026-10-26) · [Changelog](CHANGELOG.md) · MIT · **English** · [한국어](README_KO.md)
+**Version 0.3.0** (2026-10-26) · [Changelog](CHANGELOG.md) · MIT · **English** · [한국어](README_KO.md)
 
 A Claude Code plugin that reads your own Claude Code history and tells you **which areas of your work deserve a skill**.
 
@@ -22,7 +22,7 @@ The report is one file that works offline. Switch between Korean and English in 
 
 ## How it differs from `/insights`
 
-| | `/insights` | work-pattern-report |
+| | `/insights` | work-to-skills |
 |---|---|---|
 | Session goals, outcomes, friction | ✅ | reused from `/insights` |
 | Which areas need which skills | — | ✅ with rules, flow and a build prompt |
@@ -34,8 +34,8 @@ The report is one file that works offline. Switch between Korean and English in 
 ## Install
 
 ```text
-/plugin marketplace add Soulddgy/work-pattern-report
-/plugin install work-pattern-report@work-pattern-report
+/plugin marketplace add Soulddgy/work-to-skills
+/plugin install work-to-skills@work-to-skills
 ```
 
 Requirements: Claude Code and Python 3.9+.
@@ -51,7 +51,7 @@ Ask in your own words:
 - "Only my-app, October."
 - "Compare the last two weeks with the two weeks before. Did the repeats go down?"
 
-Results go to `~/Documents/work-pattern-report/`. To preview one first, download and open [`examples/sample-report.en.html`](examples/sample-report.en.html) (made-up data).
+Results go to `~/Documents/work-to-skills/`. To preview one first, download and open [`examples/sample-report.en.html`](examples/sample-report.en.html) (made-up data).
 
 ## Privacy and what it accesses
 
@@ -60,7 +60,7 @@ Everything is processed on your machine. Transcripts can contain source code and
 | | |
 |---|---|
 | **Reads** | `~/.claude/projects/*/*.jsonl` (your Claude Code transcripts) and per-project memory (`~/.claude/projects/*/memory/`), `~/.claude/usage-data/` (what `/insights` left), and to see what you already built: `~/.claude/skills/`, plus `.claude/skills/` and `CLAUDE.md` in the folders you work in. It does not read settings or credential files |
-| **Writes** | only `~/Documents/work-pattern-report/` (the report, its working data and the run history), or a folder you name |
+| **Writes** | only `~/Documents/work-to-skills/` (the report, its working data and the run history), or a folder you name |
 | **Runs** | the two bundled Python scripts (`extract.py`, `render.py`, standard library only), and your system's `open` / `xdg-open` / `start` to show the report |
 | **Network** | none. The scripts make no network requests, and the report loads nothing from the internet |
 | **Through Claude** | to label your requests, Claude reads batches of your prompts in the session, the same way it reads any file you ask it to |
