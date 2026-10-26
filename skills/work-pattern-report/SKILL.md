@@ -45,8 +45,14 @@ python3 <skill-dir>/scripts/extract.py --out <work folder> [--days 30 | --since 
 
 Check three things in the last line of JSON:
 - `prompts` is 0: re-check the window and tell the user.
-- `insights.sessions_with_facets` is 0, or `insights.latest_report_date` is more than 7 days older than the window end: tell the user in one line that running `/insights` first adds friction analysis. /insights is a built-in command only the user can type, so you cannot run it for them. Don't wait; carry on, and the report shows a note in that section instead.
 - `compact_summaries_skipped` counts the summaries the system inserts after `/compact`. Excluding them is expected.
+- **Is /insights stale?** It is stale when `insights.sessions_with_facets` is 0, when `insights.latest_report_date` is more than 7 days older than the window end, or when `insights.prompts_covered` is under half of `insights.prompts_total`. If so, stop before labeling and ask the user to refresh it first, in their language, for example:
+
+  > /insights 분석이 오래돼서(마지막 실행 2026-10-02, 이번 기간 세션 4/12개만 반영) 먼저 돌려야 합니다. `/insights` 를 입력하신 뒤 "계속"이라고 해 주세요. 지금 데이터로 그냥 만들려면 "그냥 진행"이라고 해 주세요.
+
+  `/insights` only runs when the user types it: it is blocked from the Skill tool, and you must not imitate it some other way (for example through `claude -p`). So ask, then wait for the answer. When they come back after running it, run step 1 again so the new facets are picked up, then continue. If they say to go ahead without it, continue; the report shows the coverage it had.
+
+  If you see `/insights`' own output in the conversation (it ends with an instruction to reply with a fixed message), that reply belongs to the user's `/insights` run. Do not let it replace this report: continue with these steps.
 
 Outputs:
 - `sessions.json` — per session: title, prompt count, estimated active time, top tools/commands/skills; with /insights data, `facets` (goal, outcome, friction counts and detail, summary) and `meta` (commits and so on)

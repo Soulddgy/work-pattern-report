@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 — 2026-10-26
+
+- When the /insights analysis is stale (no data, last run more than 7 days before the window end, or under half the window's prompts covered), the skill now stops and asks you to run `/insights` first, then picks up the new data when you say continue. `/insights` can only be run by the user, so the skill asks instead of running it.
+- README rewritten: version at the top, what the report shows, and plain-language notes on accuracy, active time, /insights coverage and token use.
+
 ## 0.1.0 — 2026-10-26
 
 - First release.
