@@ -1,12 +1,12 @@
 # work-to-skills
 
-**Version 0.3.0** (2026-10-26) · [Changelog](CHANGELOG.md) · MIT · **English** · [한국어](README_KO.md)
+**Version 0.3.1** (2026-10-26) · [Changelog](CHANGELOG.md) · MIT · **English** · [한국어](README_KO.md)
 
 A Claude Code plugin that reads your own Claude Code history and tells you **which areas of your work deserve a skill**.
 
 Use Claude long enough and you keep saying the same things for the same kind of work. Make short videos for a few weeks and you find yourself repeating "don't composite real photos", "feed posts are 4:5", "a zoom with no action is a redo" on different days, until you finally package it into concept, generation, edit and review skills. This plugin **finds that point in your records for you.**
 
-![Sample report (synthetic data)](docs/screenshot-en.png)
+![Sample report (synthetic data)](https://raw.githubusercontent.com/Soulddgy/work-to-skills/assets/screenshot-en.png)
 
 ## What's in the report
 

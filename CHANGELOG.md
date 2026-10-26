@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1 — 2026-10-26
+
+- Moved the README screenshots to the `assets` branch so they are no longer part of the plugin files. The directory scanner kept flagging the compressed image bytes as a shell pattern.
+
 ## 0.3.0 — 2026-10-26
 
 - **Renamed from work-pattern-report to work-to-skills**, since the main output is now the set of skills to build per work area. Install again with the new name: `/plugin marketplace add Soulddgy/work-to-skills` and `/plugin install work-to-skills@work-to-skills`. The old GitHub URL redirects.

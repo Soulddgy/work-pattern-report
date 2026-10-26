@@ -1,12 +1,12 @@
 # work-to-skills
 
-**버전 0.3.0** (2026-10-26) · [변경 내역](CHANGELOG.md) · MIT · [English](README.md) · **한국어**
+**버전 0.3.1** (2026-10-26) · [변경 내역](CHANGELOG.md) · MIT · [English](README.md) · **한국어**
 
 내 Claude Code 사용 기록을 보고 **어느 업무 영역에 스킬을 만들면 좋을지** 알려 주는 Claude Code 플러그인입니다.
 
 Claude를 오래 쓰다 보면 같은 일을 할 때마다 같은 말을 반복하게 됩니다. 예를 들어 숏폼 영상을 몇 주 만들다 보면 "실사 합성은 하지 마", "피드는 4:5로", "동작 없는 줌 컷은 다시" 같은 말을 날을 바꿔 계속 하게 되고, 결국 그걸 기획·생성·편집·검수 스킬로 묶게 됩니다. 이 플러그인은 그 지점을 **기록에서 먼저 찾아 줍니다.**
 
-![샘플 리포트 (가짜 데이터)](docs/screenshot-ko.png)
+![샘플 리포트 (가짜 데이터)](https://raw.githubusercontent.com/Soulddgy/work-to-skills/assets/screenshot-ko.png)
 
 ## 리포트에 나오는 것
 
